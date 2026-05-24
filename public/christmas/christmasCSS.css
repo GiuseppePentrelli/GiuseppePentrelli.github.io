@@ -1,0 +1,117 @@
+/* COUNTDOWN MINI RESPONSIVE */
+.countdown-container-mini {
+    padding: clamp(8px, 2vw, 12px) clamp(10px, 3vw, 18px);
+    text-align: center;
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    display: inline-block;
+    font-family: "Roboto Mono", monospace;
+    max-width: 100%;
+}
+
+.countdown-title-mini {
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    margin-bottom: clamp(6px, 2vw, 8px);
+    color: #00ffff;
+    text-shadow: 0 0 8px #00ffff;
+}
+
+/* Griglia fluida */
+.countdown-grid-mini {
+    display: flex;
+    justify-content: center;
+    gap: clamp(4px, 2vw, 8px);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Blocchi ridimensionabili */
+.countdown-block-mini {
+    padding: clamp(6px, 2vw, 8px) clamp(6px, 3vw, 10px);
+    min-width: clamp(42px, 14vw, 60px);
+    border: 1px solid #00ffff;
+    border-radius: 6px;
+    color: #00ffff;
+    text-shadow: 0 0 4px #00ffff;
+}
+
+/* Numeri fluidi */
+.countdown-number-mini {
+    font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Etichette fluide */
+.countdown-label-mini {
+    font-size: clamp(0.55rem, 2.5vw, 0.65rem);
+    display: block;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+/* Separatori */
+.separator-mini {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: bold;
+    color: #00ffff;
+    text-shadow: 0 0 4px #00ffff;
+    padding: 0 clamp(2px, 1vw, 4px);
+}
+
+@media (max-width: 360px) {
+    .countdown-grid-mini {
+        gap: 4px;
+    }
+
+    .countdown-block-mini {
+        min-width: 38px;
+        padding: 5px;
+    }
+
+    .countdown-number-mini {
+        font-size: 1rem;
+    }
+
+    .separator-mini {
+        display: none; 
+    }
+}
+
+.countdown-grid-mini {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .countdown-block-mini {
+    flex: 0 0 48%; 
+  }
+
+  .separator-mini {
+    display: none; 
+  }
+}
+
+
+
+/* ❄️ SNOW EFFECT */
+@keyframes snow {
+    0% { transform: translateY(-10vh); opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.snowflake {
+    position: fixed;
+    top: -10px;
+    color: white;
+    opacity: 0.8;
+    font-size: 1rem;
+    pointer-events: none;
+    animation: snow linear infinite;
+    display: block;
+}
+
+
