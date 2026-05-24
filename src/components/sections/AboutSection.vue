@@ -5,10 +5,10 @@
     aria-labelledby="about-title"
   >
     <div class="w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:pl-28">
-      <div class="flex flex-wrap items-start gap-8 lg:flex-nowrap">
+      <div class="about-grid">
 
         <!-- Foto con orbite -->
-        <div class="w-full lg:w-1/2 flex justify-center">
+        <div class="flex justify-center">
           <div class="astro-frame">
             <img
               :src="isChristmas ? '/christmas/christmasMedia/fotoProfilo-christmas.avif' : '/media/fotoProfilo.avif'"
@@ -26,7 +26,7 @@
         </div>
 
         <!-- Console -->
-        <div class="w-full lg:w-1/2 spaceship-console">
+        <div class="spaceship-console">
 
           <!-- Schermo typewriter -->
           <div class="viewport-screen">
@@ -85,6 +85,16 @@ watch(locale, startTypewriter)
 </script>
 
 <style scoped>
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 1023px) {
+  .about-grid { grid-template-columns: 1fr; }
+}
+
 .about-section {
   color: var(--white);
   background-color: var(--blue);
