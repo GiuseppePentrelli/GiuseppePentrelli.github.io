@@ -91,4 +91,18 @@ export const planets = [
     speed: 0.35,
     axialTilt: 1.1,
   },
+  {
+    name: 'urano',
+    orbitCenter: [14, -32, -52], // basso-destra, più lontano/piccolo degli altri: accento di sfondo
+    orbitRadius: 2,
+    orbitSpeed: 0.14,
+    orbitPhase: 6,
+    size: 1.0,
+    variant: 'bands',
+    colors: ['#bfe8e0', '#d8f5ef', '#9fd8cf'],
+    glowColor: '#bfe8e0',
+    ring: { colors: ['#cfeee8', '#eafaf5', '#a9d8cf'], tilt: 1.0 },
+    speed: 0.45,
+    axialTilt: 1.0, 
+  },
 ]

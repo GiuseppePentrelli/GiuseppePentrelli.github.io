@@ -33,7 +33,11 @@ export function createToonGradient(steps = 4) {
   const ctx = canvas.getContext('2d')
 
   for (let i = 0; i < steps; i++) {
-    const v = Math.round((i / (steps - 1)) * 255)
+    // curva (non lineare) invece di una rampa piatta: tiene i gradini intermedi più
+    // scuri più a lungo, così l'emisfero in ombra "vince" visivamente su quello
+    // illuminato e il confine luce/ombra si legge più netto
+    const t = i / (steps - 1)
+    const v = Math.round(Math.pow(t, 1.7) * 255)
     ctx.fillStyle = `rgb(${v},${v},${v})`
     ctx.fillRect(i, 0, 1, 1)
   }

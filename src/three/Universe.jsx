@@ -7,10 +7,11 @@ import Planets from './Planets'
 import SpaceWanderer from './SpaceWanderer'
 
 export default function Universe({ reducedMotion }) {
-  // posizioni condivise tra astronauta e alieno: ognuno scrive la propria qui
-  // e legge quella dell'altro per tenersi alla larga (vedi `avoid` in SpaceWanderer)
+  // posizioni condivise tra i tre wanderer: ognuno scrive la propria qui
+  // e legge quella degli altri per tenersi alla larga (vedi `avoid` in SpaceWanderer)
   const astronautPos = useRef({ x: 0, y: 0 })
   const alienPos = useRef({ x: 0, y: 0 })
+  const satellitePos = useRef({ x: 0, y: 0 })
 
   return (
     // fixed = resta fermo mentre il resto scrolla, è il fondale.
@@ -24,7 +25,7 @@ export default function Universe({ reducedMotion }) {
         <fog attach="fog" args={['#081929', 8, 120]} />
         {/* luci: ambientale bassa apposta, altrimenti il lato in ombra dei pianeti non si scurisce
             mai abbastanza e ruotando non si vede la differenza tra lato illuminato e lato in ombra */}
-        <ambientLight intensity={0.18} color="#22456b" />
+        <ambientLight intensity={0.12} color="#22456b" />
         <directionalLight position={[10, 10, 10]} intensity={1.8} color="#ffd9a0" />
         <directionalLight position={[-10, -4, -6]} intensity={0.15} color="#3f6ea5" />
         <CameraRig reduced={reducedMotion} />
@@ -33,21 +34,28 @@ export default function Universe({ reducedMotion }) {
         <Planets reduced={reducedMotion} />
         {/* Suspense: useTexture sospende il render finché l'immagine non è caricata */}
         <Suspense fallback={null}>
-          {/* astronauta e alieno: stessa animazione (SpaceWanderer), stessa profondità
-              (uno spostamento minimo su z evita z-fighting), ognuno evita l'altro tramite
-              i ref incrociati astronautPos/alienPos. Non seguono `reducedMotion`: quel
-              bottone blocca camera e stelle, ma questi devono continuare a vagare */}
+          {/* astronauta, alieno e il satellite: stessa animazione (SpaceWanderer), profondità
+              leggermente diverse (evita z-fighting), ognuno evita gli altri due tramite i ref
+              incrociati in `avoid`. Non seguono `reducedMotion`: quel bottone blocca camera e
+              stelle, ma questi devono continuare a vagare */}
           <SpaceWanderer
             src="/media/lostInTheSpace.webp"
             z={-6}
             positionRef={astronautPos}
-            avoid={[alienPos]}
+            avoid={[alienPos, satellitePos]}
           />
           <SpaceWanderer
             src="/media/alien.avif"
             z={-6.3}
             positionRef={alienPos}
-            avoid={[astronautPos]}
+            avoid={[astronautPos, satellitePos]}
+          />
+          <SpaceWanderer
+            src="/media/satellite.avif"
+            pixelSize={56}
+            z={-5.7}
+            positionRef={satellitePos}
+            avoid={[astronautPos, alienPos]}
           />
         </Suspense>
       </Canvas>
