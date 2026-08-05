@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* font Anta self-hosted invece che da Google Fonts CDN */
+@font-face {
+  font-family: "Anta";
+  src: url("/fonts/anta-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* palette presa dal sito originale, rinominata per il restyling */
+@theme {
+  --color-space-blue: rgb(8, 25, 41);
+  --color-space-green: rgb(15, 140, 105);
+  --color-space-yellow: rgb(217, 166, 72);
+  --color-space-lyellow: rgb(255, 197, 77);
+  --color-space-white: rgb(217, 202, 193);
+  --color-space-orange: rgb(217, 77, 26);
+  --color-space-cyan: rgb(0, 255, 255);
+
+  --font-display: "Anta", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--color-space-blue);
+  color: var(--color-space-white);
+}
