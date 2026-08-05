@@ -18,6 +18,7 @@
   --color-space-white: rgb(217, 202, 193);
   --color-space-orange: rgb(217, 77, 26);
   --color-space-cyan: rgb(0, 255, 255);
+  --color-console-gray: rgb(55, 71, 79);
 
   --font-display: "Anta", sans-serif;
 }
@@ -26,4 +27,53 @@ body {
   margin: 0;
   background: var(--color-space-blue);
   color: var(--color-space-white);
+}
+
+:root {
+  /* distanza minima dagli angoli/bordi dell'oblò per gli elementi fixed (bottoni, ecc.) */
+  --porthole-safe-margin: 3rem;
+}
+
+/* overlay "oblò navicella": vignettatura ai bordi + riflesso vetro */
+.porthole-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 16%, transparent 30%),
+    radial-gradient(ellipse at center, transparent 44%, rgba(0, 0, 0, 0.72) 100%);
+  box-shadow: inset 0 0 0 3px rgba(55, 71, 79, 0.35);
+}
+
+/* viti lungo i quattro bordi della cornice */
+.porthole-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, rgba(55, 71, 79, 0.7) 1.4px, transparent 1.6px) top 7px left 0 / 48px 8px repeat-x,
+    radial-gradient(circle, rgba(55, 71, 79, 0.7) 1.4px, transparent 1.6px) bottom 7px left 0 / 48px 8px repeat-x,
+    radial-gradient(circle, rgba(55, 71, 79, 0.7) 1.4px, transparent 1.6px) top 0 left 7px / 8px 48px repeat-y,
+    radial-gradient(circle, rgba(55, 71, 79, 0.7) 1.4px, transparent 1.6px) top 0 right 7px / 8px 48px repeat-y;
+}
+
+/* staffe agli angoli, in stile oblò */
+.porthole-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  --corner-color: rgba(55, 71, 79, 0.55);
+  --corner-len: 34px;
+  --corner-thick: 2px;
+  --corner-inset: 10px;
+  background:
+    linear-gradient(var(--corner-color), var(--corner-color)) left var(--corner-inset) top var(--corner-inset) / var(--corner-len) var(--corner-thick) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) left var(--corner-inset) top var(--corner-inset) / var(--corner-thick) var(--corner-len) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) right var(--corner-inset) top var(--corner-inset) / var(--corner-len) var(--corner-thick) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) right var(--corner-inset) top var(--corner-inset) / var(--corner-thick) var(--corner-len) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) left var(--corner-inset) bottom var(--corner-inset) / var(--corner-len) var(--corner-thick) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) left var(--corner-inset) bottom var(--corner-inset) / var(--corner-thick) var(--corner-len) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) right var(--corner-inset) bottom var(--corner-inset) / var(--corner-len) var(--corner-thick) no-repeat,
+    linear-gradient(var(--corner-color), var(--corner-color)) right var(--corner-inset) bottom var(--corner-inset) / var(--corner-thick) var(--corner-len) no-repeat;
 }

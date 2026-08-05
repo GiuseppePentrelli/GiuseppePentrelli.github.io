@@ -1,5 +1,6 @@
 import Universe from './three/Universe'
 import ReducedMotionToggle from './components/ReducedMotionToggle'
+import PortholeOverlay from './components/PortholeOverlay'
 import { useReducedMotion } from './hooks/useReducedMotion'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           Novenix
         </h1>
       </main>
+      <PortholeOverlay />
     </div>
   )
 }

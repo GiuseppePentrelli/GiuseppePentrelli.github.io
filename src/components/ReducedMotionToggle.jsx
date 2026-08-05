@@ -8,7 +8,7 @@ export default function ReducedMotionToggle({ reduced, onToggle }) {
       aria-pressed={reduced}
       aria-label={reduced ? 'Riattiva le animazioni' : 'Riduci le animazioni'}
       title={reduced ? 'Animazioni ridotte' : 'Animazioni attive'}
-      className="fixed top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-space-white/20 bg-space-blue/60 text-space-white backdrop-blur-sm transition hover:border-space-white/50"
+      className="fixed top-[var(--porthole-safe-margin)] right-[var(--porthole-safe-margin)] z-20 flex h-10 w-10 items-center justify-center rounded-full border border-space-white/20 bg-space-blue/60 text-space-white backdrop-blur-sm transition hover:border-space-white/50"
     >
       {reduced ? (
         // pallino fermo = animazioni ridotte
