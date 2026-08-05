@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import Starfield from './Starfield'
 import CameraRig from './CameraRig'
+import ShootingStar from './ShootingStar'
 
 export default function Universe({ reducedMotion }) {
   return (
@@ -15,6 +16,7 @@ export default function Universe({ reducedMotion }) {
         <fog attach="fog" args={['#081929', 8, 120]} />
         <CameraRig reduced={reducedMotion} />
         <Starfield reduced={reducedMotion} />
+        <ShootingStar reduced={reducedMotion} />
       </Canvas>
     </div>
   )
