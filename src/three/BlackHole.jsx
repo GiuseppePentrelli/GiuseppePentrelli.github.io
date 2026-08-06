@@ -8,12 +8,33 @@ import * as THREE from 'three'
 // (agli angoli estremi, z -90/-105)
 const POSITION = [27, 16, -68]
 const DISK_SCALE = 22
-// il buco della texture (vedi createAccretionDiskTexture) è completamente trasparente fino a
-// frazione 0.121 del mezzo-piano, poi sfuma gradualmente fino a 0.22 dove torna colorata.
-// CORE_SIZE cade a metà di quella sfumatura (frazione 0.17 * DISK_SCALE/2): abbastanza per
-// coprire la parte trasparente, abbastanza dentro la sfumatura da fondersi senza un bordo netto
-const CORE_SIZE = DISK_SCALE * 0.085
+const CORE_FADE_SCALE = DISK_SCALE * 0.32 // piano col nucleo sfumato, vedi createCoreTexture
+// la sfera vera serve solo per l'occlusione reale di quel che sta dietro: deve restare
+// nascosta dentro il nucleo pieno (piccolissimo) della texture sfumata sopra di lei, quindi
+// molto più piccola del raggio a cui quel nucleo pieno finisce (0.12 * CORE_FADE_SCALE/2)
+const CORE_SIZE = CORE_FADE_SCALE * 0.06 * 0.5
 const SPIN_SPEED = 0.15 // rad/s
+
+// nucleo pieno piccolissimo che sfuma man mano verso il trasparente: una sfera 3D ha sempre
+// un bordo netto (è geometria solida, non ha una sua sfumatura), quindi per un bordo morbido
+// serve una texture a gradiente su un piano billboard, non (solo) una mesh sferica
+function createCoreTexture() {
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  const c = size / 2
+
+  const grad = ctx.createRadialGradient(c, c, 0, c, c, size * 0.5)
+  grad.addColorStop(0, 'rgba(0,0,0,1)')
+  grad.addColorStop(0.12, 'rgba(0,0,0,1)') // nucleo pieno piccolissimo
+  grad.addColorStop(1, 'rgba(0,0,0,0)') // poi sfuma man mano fino a trasparente
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, size, size)
+
+  return new THREE.CanvasTexture(canvas)
+}
 
 // ispirato alla foto EHT del buco nero M87: non un anello netto/simmetrico come un anello
 // di Saturno, ma un vortice di plasma - gradiente continuo (mai fasce con bordi netti), più
@@ -98,6 +119,7 @@ function createAccretionDiskTexture() {
 export default function BlackHole({ reduced }) {
   const diskRef = useRef()
   const diskTexture = useMemo(() => createAccretionDiskTexture(), [])
+  const coreTexture = useMemo(() => createCoreTexture(), [])
 
   useFrame((_, delta) => {
     if (reduced || !diskRef.current) return
@@ -106,9 +128,10 @@ export default function BlackHole({ reduced }) {
 
   return (
     <group position={POSITION}>
-      {/* vuoto vero: sfera opaca, occlude davvero quel che sta dietro. fog={false}: a questa
-          profondità il fog della scena la tingerebbe di blu, uscendo dal "vuoto assoluto"
-          che deve comunicare */}
+      {/* vuoto vero: sfera opaca, occlude davvero quel che sta dietro. Resta nascosta dentro
+          il nucleo pieno della texture sfumata qui sotto (CORE_SIZE è pensato apposta più
+          piccolo). fog={false}: a questa profondità il fog della scena la tingerebbe di blu,
+          uscendo dal "vuoto assoluto" che deve comunicare */}
       <mesh>
         <sphereGeometry args={[CORE_SIZE, 32, 32]} />
         <meshBasicMaterial color="#000000" fog={false} />
@@ -128,6 +151,13 @@ export default function BlackHole({ reduced }) {
             toneMapped={false}
             fog={false}
           />
+        </mesh>
+        {/* nucleo sfumato, disegnato sopra al disco (blending normale, non additivo: deve
+            scurire quello che ha sotto, non sommarsi) - piccolo scostamento in z per garantire
+            che venga renderizzato dopo il disco, essendo alla stessa profondità del gruppo */}
+        <mesh position={[0, 0, 0.01]} scale={CORE_FADE_SCALE}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial map={coreTexture} transparent depthWrite={false} toneMapped={false} fog={false} />
         </mesh>
       </Billboard>
     </group>
