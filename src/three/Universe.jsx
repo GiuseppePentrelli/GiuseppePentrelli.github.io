@@ -5,6 +5,8 @@ import CameraRig from './CameraRig'
 import ShootingStar from './ShootingStar'
 import Planets from './Planets'
 import SpaceWanderer from './SpaceWanderer'
+import Nebula from './Nebula'
+import Asteroids from './Asteroids'
 
 export default function Universe({ reducedMotion }) {
   // posizioni condivise tra i tre wanderer: ognuno scrive la propria qui
@@ -29,11 +31,15 @@ export default function Universe({ reducedMotion }) {
         <directionalLight position={[10, 10, 10]} intensity={1.8} color="#ffd9a0" />
         <directionalLight position={[-10, -4, -6]} intensity={0.15} color="#3f6ea5" />
         <CameraRig reduced={reducedMotion} />
+        {/* più lontana di tutto il resto (z ~-95/-100): sfondo statico dietro le stelle */}
+        <Nebula />
         <Starfield reduced={reducedMotion} />
         <ShootingStar reduced={reducedMotion} />
         <Planets reduced={reducedMotion} />
         {/* Suspense: useTexture sospende il render finché l'immagine non è caricata */}
         <Suspense fallback={null}>
+          {/* layer di detriti tra i wanderer e i pianeti: rinforza la parallasse */}
+          <Asteroids reduced={reducedMotion} />
           {/* astronauta, alieno e il satellite: stessa animazione (SpaceWanderer), profondità
               leggermente diverse (evita z-fighting), ognuno evita gli altri due tramite i ref
               incrociati in `avoid`. Non seguono `reducedMotion`: quel bottone blocca camera e
