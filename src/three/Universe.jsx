@@ -9,6 +9,7 @@ import Ufo from './Ufo'
 import Nebula from './Nebula'
 import Asteroids from './Asteroids'
 import Nova from './Nova'
+import BlackHole from './BlackHole'
 
 export default function Universe({ reducedMotion }) {
   // posizioni condivise tra i tre wanderer: ognuno scrive la propria qui
@@ -39,6 +40,7 @@ export default function Universe({ reducedMotion }) {
         <ShootingStar reduced={reducedMotion} />
         <Nova reduced={reducedMotion} />
         <Planets reduced={reducedMotion} />
+        <BlackHole reduced={reducedMotion} />
         {/* Suspense: useTexture sospende il render finché l'immagine non è caricata */}
         <Suspense fallback={null}>
           {/* layer di detriti tra i wanderer e i pianeti: rinforza la parallasse */}
