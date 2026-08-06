@@ -12,7 +12,7 @@ function App() {
       <ReducedMotionToggle reduced={reducedMotion} onToggle={toggleReducedMotion} />
       {/* z-10 = sopra al canvas 3D. h1 è solo un placeholder, poi arriva l'hero vero */}
       <main className="relative z-10 flex min-h-screen items-center justify-center">
-        <h1 className="font-display text-space-white text-4xl tracking-widest uppercase">
+        <h1 className={`font-display hero-title${reducedMotion ? ' no-motion' : ''}`}>
           Novenix
         </h1>
       </main>

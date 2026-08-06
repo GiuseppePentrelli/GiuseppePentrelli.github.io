@@ -77,3 +77,120 @@ body {
     linear-gradient(var(--corner-color), var(--corner-color)) right var(--corner-inset) bottom var(--corner-inset) / var(--corner-len) var(--corner-thick) no-repeat,
     linear-gradient(var(--corner-color), var(--corner-color)) right var(--corner-inset) bottom var(--corner-inset) / var(--corner-thick) var(--corner-len) no-repeat;
 }
+
+/* titolo hero (h1), stile preso 1:1 dal vero selettore h1 del sito originale (var(--yellow)
+   lì = --color-space-yellow qui, stesso rgb 217,166,72). flickerFast è un loop infinito che
+   simula un'insegna al neon instabile: parte ferma e accesa per 2s (delay), poi ogni 3s fa
+   due micro-cali di luminosità/glow (i keyframe 18-25% e 53-57%) e torna accesa */
+.hero-title {
+  font-size: clamp(30px, 5vw, 80px);
+  padding: 20px;
+  margin: 0 0 10px;
+  font-weight: bold;
+  letter-spacing: clamp(5px, 2.5vw, 25px);
+  line-height: 1.5;
+  color: var(--color-space-yellow);
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow:
+    2px 2px 5px rgba(0, 0, 0, .7),
+    0 0 20px rgba(255, 72, 0, .8),
+    0 0 40px rgba(255, 72, 0, .5);
+  z-index: 2;
+  animation: flickerFast 3s 2s infinite;
+}
+
+/* reduced motion: niente flicker, resta fissa nello stato "acceso" definito sopra */
+.hero-title.no-motion {
+  animation: none;
+}
+
+@keyframes flickerFast {
+
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    opacity: 1;
+    text-shadow:
+      2px 2px 5px rgba(0, 0, 0, .7),
+      -2px -2px 10px rgba(255, 72, 0, .5),
+      0 0 20px rgba(255, 72, 0, .7),
+      0 0 40px rgba(255, 72, 0, .5);
+  }
+
+  19%,
+  21%,
+  23%,
+  24%,
+  54%,
+  56% {
+    opacity: 0.3;
+    text-shadow: 0 0 2px rgba(255, 72, 0, .3), 0 0 5px rgba(255, 72, 0, .2);
+  }
+}
+
+/* salvata per più avanti: titleSpaceLift nell'originale non è sull'h1, è l'effetto hover
+   delle skill-card (.skillsCard:hover, .skillsCard:hover h3/h4) e .main-title è lo stile
+   degli h2 di sezione (intro, skills, progetti, contatti) — nessuno dei due esiste ancora qui */
+.main-title {
+  font-size: clamp(20px, 6vw, 60px);
+
+  font-weight: bold;
+  letter-spacing: clamp(5px, 2.5vw, 25px);
+  line-height: 1.5;
+  margin: 0;
+  color: var(--color-space-yellow);
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow:
+    2px 2px 5px rgba(0, 0, 0, .7),
+    0 0 20px rgba(255, 72, 0, .8),
+    0 0 40px rgba(255, 72, 0, .5);
+  z-index: 2;
+  animation: titleSpaceLift 900ms ease-out forwards;
+}
+
+/* reduced motion: niente lift/tilt, il titolo compare direttamente fermo */
+.main-title.no-motion {
+  animation: none;
+}
+
+/* keyframes generici: solleva, inclina, skew e bagliore */
+@keyframes titleSpaceLift {
+  0% {
+    transform: none;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+    filter: brightness(1);
+  }
+
+  35% {
+    transform: translateY(-10px) rotateX(9deg) rotateZ(-3deg) skewX(-2deg) scale(1.03);
+    text-shadow:
+      0 0 8px rgba(0, 255, 255, 0.12),
+      0 0 18px rgba(0, 255, 128, 0.08),
+      3px 3px 6px rgba(0, 0, 0, 0.45);
+    filter: brightness(1.04);
+  }
+
+  65% {
+    transform: translateY(-7px) rotateX(6deg) rotateZ(1deg) skewX(0deg) scale(1.025);
+    text-shadow:
+      0 0 10px rgba(0, 255, 255, 0.14),
+      0 0 22px rgba(0, 255, 128, 0.10),
+      2px 2px 5px rgba(0, 0, 0, 0.42);
+    filter: brightness(1.03);
+  }
+
+  100% {
+    transform: translateY(-9px) rotateX(6deg) rotateZ(0deg) skewX(-1deg) scale(1.03);
+    text-shadow:
+      0 0 12px rgba(0, 255, 255, 0.16),
+      0 0 26px rgba(0, 255, 128, 0.12),
+      2px 2px 5px rgba(0, 0, 0, 0.4);
+    filter: brightness(1.03);
+  }
+}

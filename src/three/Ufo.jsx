@@ -18,8 +18,8 @@ const ENTRY_MARGIN = 0.5 // quanto oltre il bordo inferiore parte, stessa idea d
 const OFFSCREEN_MARGIN = 0.15 // margine NDC oltre cui il boost si considera "uscito", come in ShootingStar.jsx
 const MAX_LIFETIME_S = 6 // tetto di sicurezza assoluto se per qualche motivo non esce mai dall'inquadratura
 
-const MIN_INTERVAL_MS = 45000
-const MAX_INTERVAL_MS = 90000
+const MIN_INTERVAL_MS = 35000
+const MAX_INTERVAL_MS = 50000
 
 function randFloat(min, max) {
   return min + Math.random() * (max - min)
