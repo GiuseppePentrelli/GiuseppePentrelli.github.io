@@ -5,6 +5,7 @@ import CameraRig from './CameraRig'
 import ShootingStar from './ShootingStar'
 import Planets from './Planets'
 import SpaceWanderer from './SpaceWanderer'
+import Ufo from './Ufo'
 
 export default function Universe({ reducedMotion }) {
   // posizioni condivise tra i tre wanderer: ognuno scrive la propria qui
@@ -57,6 +58,11 @@ export default function Universe({ reducedMotion }) {
             positionRef={satellitePos}
             avoid={[astronautPos, alienPos]}
           />
+        </Suspense>
+        {/* Suspense dedicato e separato da quello sopra: se manca/fallisce l'asset dell'UFO
+            non deve trascinare giù astronauta/alieno/satellite (nessun ErrorBoundary nel repo) */}
+        <Suspense fallback={null}>
+          <Ufo src="/media/ufo.avif" reduced={reducedMotion} />
         </Suspense>
       </Canvas>
     </div>
