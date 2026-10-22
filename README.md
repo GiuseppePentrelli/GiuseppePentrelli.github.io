@@ -1,16 +1,16 @@
-# React + Vite
+# Novenix
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Il mio portfolio: un viaggio nello spazio in 3D, tra pianeti, stelle cadenti, un buco nero e qualche visitatore di passaggio.
 
-Currently, two official plugins are available:
+È la nuova versione di Novenix, il mio primo sito, che resta online su [novenix.altervista.org](https://novenix.altervista.org/). Questa l'ho rifatta da zero con React, React Three Fiber e Tailwind CSS.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Online su **[giuseppepentrelli.github.io](https://giuseppepentrelli.github.io/)**.
 
-## React Compiler
+## Avvio in locale
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+`npm run build` crea la versione di produzione. Il deploy su GitHub Pages parte da solo a ogni push su `main`.
