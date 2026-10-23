@@ -5,6 +5,6 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  // BASE_PATH si imposta dopo, quando scegliamo il repo GitHub
+  // sito utente giuseppepentrelli.github.io: servito dalla radice, BASE_PATH solo per build in sottocartella
   base: process.env.BASE_PATH || '/',
 })
