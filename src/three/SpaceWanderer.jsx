@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture, Billboard } from '@react-three/drei'
 import { Vector3 } from 'three'
+import { randFloat, viewCenterAt } from './utils'
 
 // componente generico: fa "vagare" un'immagine per lo schermo con velocità e
 // rotazione random, come se si vedesse lo spazio attraverso un oblò — quando
@@ -26,10 +27,6 @@ const RESPAWN_RETRIES = 5
 const RESPAWN_MARGIN = 0.5 // quanto oltre il proprio bordo appare/scompare l'oggetto
 const EDGE_SPREAD_DEG = 50 // variazione random attorno alla direzione "verso il centro" al rientro
 
-function randRange(min, max) {
-  return min + Math.random() * (max - min)
-}
-
 // normalizza un angolo qualsiasi nell'intervallo (-PI, PI]
 function wrapAngle(angle) {
   return Math.atan2(Math.sin(angle), Math.cos(angle))
@@ -50,25 +47,25 @@ function randomEdgeSpawn(bounds) {
   switch (edge) {
     case 0:
       x = cx - halfW - halfSize - RESPAWN_MARGIN
-      y = randRange(cy - halfH, cy + halfH)
+      y = randFloat(cy - halfH, cy + halfH)
       baseAngle = 0
       break
     case 1:
       x = cx + halfW + halfSize + RESPAWN_MARGIN
-      y = randRange(cy - halfH, cy + halfH)
+      y = randFloat(cy - halfH, cy + halfH)
       baseAngle = 180
       break
     case 2:
-      x = randRange(cx - halfW, cx + halfW)
+      x = randFloat(cx - halfW, cx + halfW)
       y = cy + halfH + halfSize + RESPAWN_MARGIN
       baseAngle = -90
       break
     default:
-      x = randRange(cx - halfW, cx + halfW)
+      x = randFloat(cx - halfW, cx + halfW)
       y = cy - halfH - halfSize - RESPAWN_MARGIN
       baseAngle = 90
   }
-  const angle = ((baseAngle + randRange(-EDGE_SPREAD_DEG, EDGE_SPREAD_DEG)) * Math.PI) / 180
+  const angle = ((baseAngle + randFloat(-EDGE_SPREAD_DEG, EDGE_SPREAD_DEG)) * Math.PI) / 180
   return { x, y, angle }
 }
 
@@ -140,13 +137,9 @@ export default function SpaceWanderer({
     // questo momento. Lo trovo intersecando la direzione di sguardo col piano z = questa
     // profondità — senza questo, i bordi calcolati non seguono ciò che si vede davvero,
     // e gli sprite vengono dichiarati dentro/fuori schermo nel punto sbagliato.
-    // Assume che la camera resti sempre più vicina a z=0 dello sprite (forwardRef.z < 0,
-    // mai zero): vero con l'attuale CameraRig, che parte a z=1 e guarda sempre l'origine.
-    // Se in futuro la camera cambiasse comportamento (dolly, target diverso), va riverificato.
-    camera.getWorldDirection(forwardRef.current)
-    const planeDist = (z - camera.position.z) / forwardRef.current.z
-    const cx = camera.position.x + forwardRef.current.x * planeDist
-    const cy = camera.position.y + forwardRef.current.y * planeDist
+    // Assume che la camera guardi sempre verso z negative (forward.z < 0, mai zero): vero
+    // con l'attuale CameraRig. Se cambiasse comportamento (dolly, target diverso), va riverificato.
+    const { x: cx, y: cy } = viewCenterAt(camera, z, forwardRef.current)
     const bounds = { cx, cy, halfW, halfH, halfSize }
 
     if (!posRef.current) {

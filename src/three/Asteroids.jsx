@@ -3,6 +3,9 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { createToonGradient, createCraterTexture } from './planetTextures'
 import { useRandomInterval } from '../hooks/useRandomInterval'
+import { zAt } from './layout'
+import { mulberry32, randFloat, smoothstep } from './utils'
+import { palette } from './palette'
 
 // gruppetto di detriti che attraversa la scena ogni tanto (stessa filosofia di
 // ShootingStar: useRandomInterval decide *quando*, un componente a sé per ogni
@@ -12,13 +15,13 @@ const MIN_INTERVAL_MS = 25000
 const MAX_INTERVAL_MS = 50000
 const COUNT = 8
 const GEOMETRY_VARIANTS = 4
-const GROUP_Z = -8.5 // vicino ai wanderer (z ~-6/-6.3), più avanti dei pianeti: sembrano grandi
+const GROUP_Z = zAt(20) // dietro ai wanderer (14-15 dalla camera), davanti ai pianeti: sembrano grandi
 // raggio (ellittico) del cerchio di punti di ingresso/uscita attorno al centro scena:
 // abbastanza largo da restare fuori dalla vista in qualunque direzione di passaggio
 const PASS_RADIUS_X = 24
 const PASS_RADIUS_Y = 11
 const PASS_LATERAL_JITTER = 5 // scarto laterale dal centro: non attraversa sempre lo stesso punto
-const PASS_Z_JITTER = 2
+const PASS_Z_JITTER = 4.2
 // durata del passaggio scelta direttamente (non derivata da distanza/velocità): la
 // distanza tra ingresso e uscita varia parecchio con l'angolo (da 2×RADIUS_Y a
 // 2×RADIUS_X), una velocità fissa avrebbe reso alcuni passaggi troppo brevi per fare in
@@ -26,22 +29,12 @@ const PASS_Z_JITTER = 2
 // ShootingStar/randomComet: distanza e durata indipendenti, la velocità si ricava dopo)
 const LIFETIME_RANGE = [9, 17]
 const TRANSITION_TIME_S = 3.5 // durata (secondi) di comparsa/scomparsa graduale a inizio/fine passaggio
-const RECESSION_DEPTH = 10 // quanto extra si allontanano in z durante la comparsa/scomparsa
-const CLUSTER_SPREAD = { x: 5.5, y: 3, z: 3 } // offset massimo di ogni sasso dal centro:
+const RECESSION_DEPTH = 21 // quanto extra si allontanano in z durante la comparsa/scomparsa
+const CLUSTER_SPREAD = { x: 5.5, y: 3, z: 6.3 } // offset massimo di ogni sasso dal centro:
 // abbastanza largo da non far toccare i contorni cartoon tra un sasso e l'altro
 // un colore diverso per ogni sasso (COUNT===length): niente ripetizioni, si distinguono
 // anche quando si sovrappongono in profondità
 const ROCK_COLORS = ['#9c8465', '#5f5850', '#b39a72', '#443f3a', '#8a6f56', '#6e6558', '#a68a5c', '#8c7f6a']
-
-function randRange(min, max) {
-  return min + Math.random() * (max - min)
-}
-
-// easing 0→1 invece di una rampa lineare: la comparsa/scomparsa parte e finisce dolce
-function smoothstep(t) {
-  const c = THREE.MathUtils.clamp(t, 0, 1)
-  return c * c * (3 - 2 * c)
-}
 
 // schiarisce (percent > 0) o scurisce (percent < 0) un colore esadecimale - serve per
 // derivare le macchie dei crateri dal colore base di ogni sasso
@@ -53,18 +46,6 @@ function shade(hex, percent) {
   const g = clamp(((num >> 8) & 0x00ff) + amt)
   const b = clamp((num & 0x0000ff) + amt)
   return `rgb(${r},${g},${b})`
-}
-
-// PRNG deterministico (mulberry32): stesso seed = stessa geometria, serve per
-// generare un piccolo pool di sassi diversi una sola volta e riusarli sulle 8 istanze
-function mulberry32(seed) {
-  return function () {
-    seed |= 0
-    seed = (seed + 0x6d2b79f5) | 0
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
 }
 
 // icosaedro deformato sommando qualche onda sinusoidale lungo direzioni casuali (niente
@@ -116,14 +97,14 @@ function createRockIdentity(index) {
 function createRockInstance() {
   return {
     offset: new THREE.Vector3(
-      randRange(-CLUSTER_SPREAD.x, CLUSTER_SPREAD.x),
-      randRange(-CLUSTER_SPREAD.y, CLUSTER_SPREAD.y),
-      randRange(-CLUSTER_SPREAD.z, CLUSTER_SPREAD.z)
+      randFloat(-CLUSTER_SPREAD.x, CLUSTER_SPREAD.x),
+      randFloat(-CLUSTER_SPREAD.y, CLUSTER_SPREAD.y),
+      randFloat(-CLUSTER_SPREAD.z, CLUSTER_SPREAD.z)
     ),
-    scale: new THREE.Vector3(randRange(0.4, 0.75), randRange(0.35, 0.6), randRange(0.4, 0.7)),
-    spinAxis: new THREE.Vector3(randRange(-1, 1), randRange(-1, 1), randRange(-1, 1)).normalize(),
-    spinSpeed: randRange(0.3, 0.9) * (Math.random() < 0.5 ? -1 : 1),
-    spinAngle: randRange(0, Math.PI * 2),
+    scale: new THREE.Vector3(randFloat(0.4, 0.75), randFloat(0.35, 0.6), randFloat(0.4, 0.7)),
+    spinAxis: new THREE.Vector3(randFloat(-1, 1), randFloat(-1, 1), randFloat(-1, 1)).normalize(),
+    spinSpeed: randFloat(0.3, 0.9) * (Math.random() < 0.5 ? -1 : 1),
+    spinAngle: randFloat(0, Math.PI * 2),
   }
 }
 
@@ -131,13 +112,13 @@ function createRockInstance() {
 // un'ellisse attorno al centro scena, con angolo e scarto laterale casuali - ogni
 // volta entra/esce da un punto diverso, mai lo stesso percorso rettilineo
 function randomPass() {
-  const angle = randRange(0, Math.PI * 2)
+  const angle = randFloat(0, Math.PI * 2)
   const dirX = Math.cos(angle)
   const dirY = Math.sin(angle)
   const perpX = -dirY
   const perpY = dirX
-  const lateral = randRange(-PASS_LATERAL_JITTER, PASS_LATERAL_JITTER)
-  const z = GROUP_Z + randRange(-PASS_Z_JITTER, PASS_Z_JITTER)
+  const lateral = randFloat(-PASS_LATERAL_JITTER, PASS_LATERAL_JITTER)
+  const z = GROUP_Z + randFloat(-PASS_Z_JITTER, PASS_Z_JITTER)
 
   const start = new THREE.Vector3(
     -dirX * PASS_RADIUS_X + perpX * lateral,
@@ -145,7 +126,7 @@ function randomPass() {
     z
   )
   const end = new THREE.Vector3(dirX * PASS_RADIUS_X - perpX * lateral, dirY * PASS_RADIUS_Y - perpY * lateral, z)
-  const lifetime = randRange(...LIFETIME_RANGE)
+  const lifetime = randFloat(...LIFETIME_RANGE)
 
   return { start, end, lifetime }
 }
@@ -205,7 +186,7 @@ function AsteroidPass({ start, end, lifetime, reduced, onDone }) {
       {/* contorno cartoon: stessa geometria vista da dentro (BackSide) e leggermente
           più grande, coperta al centro dal sasso vero - come su Planet.jsx */}
       <mesh geometry={geometries[identity.geometryIndex]} scale={1.08}>
-        <meshBasicMaterial color="#050912" side={THREE.BackSide} />
+        <meshBasicMaterial color={palette.outline} side={THREE.BackSide} />
       </mesh>
     </group>
   ))
@@ -224,7 +205,7 @@ export default function Asteroids({ reduced }) {
     },
     MIN_INTERVAL_MS,
     MAX_INTERVAL_MS,
-    { enabled: !reduced }
+    { enabled: !reduced, name: 'asteroidi' }
   )
 
   const handleDone = useCallback((id) => {

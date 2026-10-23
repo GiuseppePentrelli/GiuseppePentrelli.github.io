@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { palette } from './palette'
 
 // texture generate a runtime con canvas 2D: niente immagini esterne da scaricare/licenziare
 
@@ -97,11 +98,21 @@ export function createRingTexture(colors, holeRatio = 0.5) {
   ctx.fill()
   ctx.globalCompositeOperation = 'source-over'
 
+  // contorno cartoon sul bordo esterno e su quello interno, come il guscio scuro dei pianeti
+  ctx.strokeStyle = palette.outline
+  ctx.lineWidth = 8
+  ctx.beginPath()
+  ctx.arc(c, c, maxR - 4, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(c, c, maxR * holeRatio + 4, 0, Math.PI * 2)
+  ctx.stroke()
+
   return new THREE.CanvasTexture(canvas)
 }
 
-// alone morbido per il bagliore/atmosfera attorno al pianeta
-export function createGlowTexture(color) {
+// bagliore morbido, dal colore pieno al centro al trasparente sul bordo: lo usa solo la nebulosa
+export function createSoftGlowTexture(color) {
   const canvas = document.createElement('canvas')
   canvas.width = 128
   canvas.height = 128
@@ -112,6 +123,26 @@ export function createGlowTexture(color) {
   grad.addColorStop(1, 'transparent')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  return new THREE.CanvasTexture(canvas)
+}
+
+// alone dell'atmosfera in stile cartoon: due anelli netti di trasparenza diversa invece di
+// una sfumatura continua. Il pianeta copre il centro, quindi si vedono solo le fasce esterne
+export function createGlowTexture(color, bands = [[1, 0.14], [0.94, 0.28]]) {
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 256
+  const ctx = canvas.getContext('2d')
+  const c = canvas.width / 2
+
+  ctx.fillStyle = color
+  bands.forEach(([radius, alpha]) => {
+    ctx.globalAlpha = alpha
+    ctx.beginPath()
+    ctx.arc(c, c, c * radius, 0, Math.PI * 2)
+    ctx.fill()
+  })
 
   return new THREE.CanvasTexture(canvas)
 }

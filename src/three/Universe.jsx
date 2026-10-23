@@ -10,6 +10,11 @@ import Nebula from './Nebula'
 import Asteroids from './Asteroids'
 import Nova from './Nova'
 import BlackHole from './BlackHole'
+import Twinkles from './Twinkles'
+import SpaceDust from './SpaceDust'
+import GreatComet from './GreatComet'
+import Rocket from './Rocket'
+import { CAMERA_Z, FOV, zAt } from './layout'
 
 export default function Universe({ reducedMotion }) {
   // posizioni condivise tra i tre wanderer: ognuno scrive la propria qui
@@ -22,25 +27,30 @@ export default function Universe({ reducedMotion }) {
     // fixed = resta fermo mentre il resto scrolla, è il fondale.
     // pointer-events-none è fondamentale: senza, il canvas ruberebbe
     // click e scroll al contenuto che ci mettiamo sopra.
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
       {/* dpr limitato a 2x: sugli schermi ad altissima densità (tipo i telefoni recenti)
           renderizzare a 3x manderebbe in fumo le prestazioni senza benefici visibili */}
-      <Canvas camera={{ position: [0, 0, 1] }} dpr={[1, 2]}>
+      <Canvas camera={{ position: [0, 0, CAMERA_Z], fov: FOV }} dpr={[1, 2]}>
         {/* fog: le stelle lontane sfumano nel blu invece di restare tutte nitide - dà profondità */}
-        <fog attach="fog" args={['#081929', 8, 120]} />
+        <fog attach="fog" args={['#081929', 17, 253]} />
         {/* luci: ambientale bassa apposta, altrimenti il lato in ombra dei pianeti non si scurisce
             mai abbastanza e ruotando non si vede la differenza tra lato illuminato e lato in ombra */}
         <ambientLight intensity={0.12} color="#22456b" />
         <directionalLight position={[10, 10, 10]} intensity={1.8} color="#ffd9a0" />
         <directionalLight position={[-10, -4, -6]} intensity={0.15} color="#3f6ea5" />
         <CameraRig reduced={reducedMotion} />
-        {/* più lontana di tutto il resto (z ~-95/-100): sfondo statico dietro le stelle */}
+        {/* più lontana di tutto il resto: sfondo statico dietro le stelle */}
         <Nebula />
         <Starfield reduced={reducedMotion} />
+        <Twinkles reduced={reducedMotion} />
         <ShootingStar reduced={reducedMotion} />
         <Nova reduced={reducedMotion} />
+        <GreatComet reduced={reducedMotion} />
         <Planets reduced={reducedMotion} />
         <BlackHole reduced={reducedMotion} />
+        <Rocket reduced={reducedMotion} />
+        {/* la cosa più vicina alla camera dopo l'UFO: dà la profondità quando la camera si muove */}
+        <SpaceDust reduced={reducedMotion} />
         {/* Suspense: useTexture sospende il render finché l'immagine non è caricata */}
         <Suspense fallback={null}>
           {/* layer di detriti tra i wanderer e i pianeti: rinforza la parallasse */}
@@ -51,20 +61,20 @@ export default function Universe({ reducedMotion }) {
               stelle, ma questi devono continuare a vagare */}
           <SpaceWanderer
             src="/media/lostInTheSpace.webp"
-            z={-6}
+            z={zAt(14.8)}
             positionRef={astronautPos}
             avoid={[alienPos, satellitePos]}
           />
           <SpaceWanderer
             src="/media/alien.avif"
-            z={-6.3}
+            z={zAt(15.4)}
             positionRef={alienPos}
             avoid={[astronautPos, satellitePos]}
           />
           <SpaceWanderer
             src="/media/satellite.avif"
             pixelSize={56}
-            z={-5.7}
+            z={zAt(14.1)}
             positionRef={satellitePos}
             avoid={[astronautPos, alienPos]}
           />

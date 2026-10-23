@@ -1,8 +1,9 @@
 import { useRef, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
 import { createBandedTexture, createCraterTexture, createToonGradient, createGlowTexture, createRingTexture } from './planetTextures'
+import { palette } from './palette'
 
 // variant "bands" -> colors è un array di colori (le fasce, tipo Giove), spotColor è l'occhiolino opzionale
 // variant "craters" -> colors è [colore base, ...colori delle macchie] (tipo Luna cartoon)
@@ -12,7 +13,7 @@ export default function Planet({
   colors,
   spotColor,
   glowColor,
-  outlineColor = '#050912',
+  outlineColor = palette.outline,
   size = 1,
   speed = 0.05,
   axialTilt = 0,
@@ -25,7 +26,9 @@ export default function Planet({
 }) {
   const groupRef = useRef()
   const spinRef = useRef()
+  const ringRef = useRef()
   const angleRef = useRef(orbitPhase)
+  const camera = useThree((state) => state.camera)
 
   // le texture si generano una volta sola, non ad ogni render
   const surfaceMap = useMemo(
@@ -44,6 +47,11 @@ export default function Planet({
   ]
 
   useFrame((_, delta) => {
+    // l'anello guarda sempre la camera e si inclina di un angolo fisso rispetto a lei: così
+    // resta un'ellisse ovunque sia il pianeta. Con un'inclinazione fissa nel mondo, i pianeti
+    // molto in alto o in basso lo vedevano di taglio, come una linea
+    if (ringRef.current) ringRef.current.lookAt(camera.position)
+
     if (reduced) return
 
     spinRef.current.rotation.y += delta * speed
@@ -74,10 +82,12 @@ export default function Planet({
         <meshBasicMaterial color={outlineColor} side={THREE.BackSide} />
       </mesh>
       {ring && (
-        <mesh rotation={[ring.tilt ?? -1.1, 0, 0]}>
-          <planeGeometry args={[size * 4.2, size * 4.2]} />
-          <meshBasicMaterial map={ringMap} transparent alphaTest={0.1} side={THREE.DoubleSide} />
-        </mesh>
+        <group ref={ringRef}>
+          <mesh rotation={[ring.tilt ?? -1.1, 0, 0]}>
+            <planeGeometry args={[size * 4.2, size * 4.2]} />
+            <meshBasicMaterial map={ringMap} transparent alphaTest={0.1} side={THREE.DoubleSide} />
+          </mesh>
+        </group>
       )}
       {/* alone di atmosfera: sprite dietro alla sfera, visibile solo attorno al bordo */}
       <Billboard>

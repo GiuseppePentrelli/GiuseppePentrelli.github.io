@@ -2,11 +2,16 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
+import { isPortrait, placeAt, useAspect } from './layout'
 
 // landmark fisso, non un evento one-shot come Ufo/Nova: sta in un angolo di cielo libero da
 // pianeti (che occupano z -20/-52 in un raggio di ~40 unità dall'origine) e nuvole di nebulosa
 // (agli angoli estremi, z -90/-105)
-const POSITION = [27, 16, -68]
+const ANCHOR = [0.32, 0.3]
+// sul telefono in verticale resta dentro lo schermo, un po' più piccolo
+const PORTRAIT_ANCHOR = [0.5, 0.3]
+const PORTRAIT_SCALE = 0.7
+const DISTANCE = 145
 const DISK_SCALE = 22
 const CORE_FADE_SCALE = DISK_SCALE * 0.32 // piano col nucleo sfumato, vedi createCoreTexture
 // la sfera vera serve solo per l'occlusione reale di quel che sta dietro: deve restare
@@ -118,6 +123,8 @@ function createAccretionDiskTexture() {
 
 export default function BlackHole({ reduced }) {
   const diskRef = useRef()
+  const aspect = useAspect()
+  const portrait = isPortrait(aspect)
   const diskTexture = useMemo(() => createAccretionDiskTexture(), [])
   const coreTexture = useMemo(() => createCoreTexture(), [])
 
@@ -127,7 +134,7 @@ export default function BlackHole({ reduced }) {
   })
 
   return (
-    <group position={POSITION}>
+    <group position={placeAt(portrait ? PORTRAIT_ANCHOR : ANCHOR, DISTANCE, aspect)} scale={portrait ? PORTRAIT_SCALE : 1}>
       {/* vuoto vero: sfera opaca, occlude davvero quel che sta dietro. Resta nascosta dentro
           il nucleo pieno della texture sfumata qui sotto (CORE_SIZE è pensato apposta più
           piccolo). fog={false}: a questa profondità il fog della scena la tingerebbe di blu,

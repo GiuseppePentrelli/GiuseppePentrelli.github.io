@@ -3,13 +3,13 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useTexture, Billboard } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { useRandomInterval } from '../hooks/useRandomInterval'
+import { zAt } from './layout'
+import { randFloat, viewCenterAt } from './utils'
 
-// profondità fissa: molto più vicina alla camera (z=1, mai animata sull'asse z, vedi
-// CameraRig.jsx) dei tre SpaceWanderer (z=-6/-6.3/-5.7). Distanza on-axis 3.5 invece di 7:
-// il parallasse generato dal movimento xy della camera è ~2x più marcato, che è ciò che fa
-// "sentire" l'UFO vicino — non serve ingrandirlo, basta dimezzare la distanza. Margine di
-// 3.4 unità dal near clip (~0.9): nessun rischio di clipping anche a camera tutta spostata.
-const Z = -2.5
+// profondità fissa: a metà distanza dei tre SpaceWanderer (7.4 dalla camera invece di
+// 14-15): il parallasse generato dal movimento xy della camera è ~2x più marcato, che è ciò
+// che fa "sentire" l'UFO vicino — non serve ingrandirlo, basta dimezzare la distanza
+const Z = zAt(7.4)
 const PIXEL_SIZE = 200 // molto più prominente dei 56-60px dei wanderer, coerente con l'effetto ravvicinato
 
 const T_ENTER = 0.9 // risalita da sotto lo schermo fino all'hover
@@ -20,10 +20,6 @@ const MAX_LIFETIME_S = 6 // tetto di sicurezza assoluto se per qualche motivo no
 
 const MIN_INTERVAL_MS = 35000
 const MAX_INTERVAL_MS = 50000
-
-function randFloat(min, max) {
-  return min + Math.random() * (max - min)
-}
 
 // singolo passaggio dell'UFO: sale da sotto lo schermo vicino alla camera, fluttua un attimo
 // "guardando" l'utente (il Billboard lo fa gratis, nessun lookAt da scrivere) oscillando un
@@ -70,10 +66,7 @@ function UfoActor({ src, reduced, onDone }) {
 
     if (halfW < 0.5 || halfH < 0.5) return // canvas non ancora dimensionato, aspetta il prossimo frame
 
-    camera.getWorldDirection(forwardRef.current)
-    const planeDist = (Z - camera.position.z) / forwardRef.current.z
-    const cx = camera.position.x + forwardRef.current.x * planeDist
-    const cy = camera.position.y + forwardRef.current.y * planeDist
+    const { x: cx, y: cy } = viewCenterAt(camera, Z, forwardRef.current)
 
     if (!paramsRef.current) {
       paramsRef.current = {
@@ -174,7 +167,7 @@ export default function Ufo({ src, reduced }) {
     },
     MIN_INTERVAL_MS,
     MAX_INTERVAL_MS,
-    { enabled: !reduced }
+    { enabled: !reduced, name: 'ufo' }
   )
 
   const handleDone = useCallback((id) => {

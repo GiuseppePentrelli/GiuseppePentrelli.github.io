@@ -3,6 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Trail } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { useRandomInterval } from '../hooks/useRandomInterval'
+import { zAt } from './layout'
+import { randFloat } from './utils'
 
 const MIN_INTERVAL_MS = 10000
 const MAX_INTERVAL_MS = 20000
@@ -12,10 +14,6 @@ const MAX_DURATION_S = 1
 const OFFSCREEN_MARGIN = 0.15
 // tetto di sicurezza: se per qualche motivo non esce mai dallo schermo, la fermiamo comunque
 const MAX_LIFETIME_S = 5
-
-function randFloat(min, max) {
-  return min + Math.random() * (max - min)
-}
 
 // genera posizione di partenza, direzione e velocità random per un singolo passaggio.
 // MIN/MAX_DURATION_S non sono più il tempo di vita reale (quello lo decide l'uscita
@@ -28,7 +26,7 @@ function randomComet() {
   const speed = distance / randFloat(MIN_DURATION_S, MAX_DURATION_S)
 
   return {
-    start: [randFloat(-16, 16), randFloat(4, 10), randFloat(-28, -12)],
+    start: [randFloat(-16, 16), randFloat(4, 10), zAt(randFloat(27, 61))],
     velocity: [Math.cos(rad) * speed, Math.sin(rad) * speed, 0],
   }
 }
@@ -94,7 +92,7 @@ export default function ShootingStar({ reduced }) {
     },
     MIN_INTERVAL_MS,
     MAX_INTERVAL_MS,
-    { enabled: !reduced }
+    { enabled: !reduced, name: 'stella' }
   )
 
   const handleDone = useCallback((id) => {

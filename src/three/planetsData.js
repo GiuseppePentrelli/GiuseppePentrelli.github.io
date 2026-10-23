@@ -1,8 +1,12 @@
 // dati dei pianeti separati dal rendering (Planets.jsx): aggiungerne uno nuovo
 // significa solo aggiungere un oggetto qui, zero modifiche alla logica
 //
+// posizione: `anchor` è il punto dello schermo (-1..1, 0 = centro) attorno a cui orbita,
+// `distance` la distanza dalla camera (vedi layout.js). `portrait` sostituisce ancora e
+// dimensione sui telefoni in verticale, dove l'inquadratura è stretta e alta
+//
 // principi seguiti per la profondità "vista dall'oblò":
-// 1. vicino = grande, lontano = piccolo (size cala insieme a orbitCenter[2] più negativo)
+// 1. vicino = grande, lontano = piccolo (size cala insieme a distance)
 // 2. un quadrante ciascuno (alto-dx, alto-sx, basso-dx, basso-sx), uno vicino al centro
 //    per bilanciare, uno spinto verso il bordo per l'effetto "sbuca guardandosi intorno"
 // 3. axialTilt diverso per ognuno: le bande sono strisce di latitudine, senza un'inclinazione
@@ -10,7 +14,9 @@
 export const planets = [
   {
     name: 'giove',
-    orbitCenter: [32, -20, -36],
+    anchor: [0.7, -0.7],
+    distance: 78,
+    portrait: { anchor: [0.6, -0.6], scale: 0.62 },
     orbitRadius: 3,
     orbitSpeed: 0.08,
     orbitPhase: 2,
@@ -24,7 +30,9 @@ export const planets = [
   },
   {
     name: 'terra',
-    orbitCenter: [-24, 15, -28],
+    anchor: [-0.67, 0.67],
+    distance: 61,
+    portrait: { anchor: [-0.62, 0.52], scale: 0.85 },
     orbitRadius: 3.5,
     orbitSpeed: 0.15,
     orbitPhase: 3,
@@ -37,7 +45,9 @@ export const planets = [
   },
   {
     name: 'luna',
-    orbitCenter: [-4, -11, -20],
+    anchor: [-0.16, -0.68],
+    distance: 44,
+    portrait: { anchor: [-0.45, -0.3] },
     orbitRadius: 4,
     orbitSpeed: 0.18,
     orbitPhase: 0,
@@ -50,7 +60,9 @@ export const planets = [
   },
   {
     name: 'saturno',
-    orbitCenter: [38, 24, -45],
+    anchor: [0.67, 0.68],
+    distance: 97,
+    portrait: { anchor: [0.2, 0.72], scale: 0.85 },
     orbitRadius: 3.5,
     orbitSpeed: 0.12,
     orbitPhase: 4,
@@ -66,7 +78,9 @@ export const planets = [
   // si scopre del tutto guardandosi intorno col mouse
   {
     name: 'marte',
-    orbitCenter: [-34, -3, -30],
+    anchor: [-0.89, -0.13],
+    distance: 65,
+    portrait: { anchor: [-0.9, 0.05] },
     orbitRadius: 3,
     orbitSpeed: 0.22,
     orbitPhase: 1,
@@ -79,7 +93,9 @@ export const planets = [
   },
   {
     name: 'nettuno',
-    orbitCenter: [-32, -22, -32],
+    anchor: [-0.79, -0.87],
+    distance: 70,
+    portrait: { anchor: [-0.55, -0.82] },
     orbitRadius: 2.5,
     orbitSpeed: 0.1,
     orbitPhase: 5,
@@ -93,7 +109,9 @@ export const planets = [
   },
   {
     name: 'urano',
-    orbitCenter: [14, -32, -52], // basso-destra, più lontano/piccolo degli altri: accento di sfondo
+    anchor: [0.22, -0.79], // basso-destra, più lontano/piccolo degli altri: accento di sfondo
+    distance: 112,
+    portrait: { anchor: [0.2, -0.9] },
     orbitRadius: 2,
     orbitSpeed: 0.14,
     orbitPhase: 6,
@@ -103,6 +121,6 @@ export const planets = [
     glowColor: '#bfe8e0',
     ring: { colors: ['#cfeee8', '#eafaf5', '#a9d8cf'], tilt: 1.0 },
     speed: 0.45,
-    axialTilt: 1.0, 
+    axialTilt: 1.0,
   },
 ]

@@ -1,95 +1,100 @@
 import { useCallback, useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
-import { AdditiveBlending, CanvasTexture, Vector3 } from 'three'
+import { CanvasTexture, Vector3 } from 'three'
 import { useRandomInterval } from '../hooks/useRandomInterval'
+import { zAt } from './layout'
+import { palette } from './palette'
+import { createCanvas, randFloat, viewCenterAt } from './utils'
 
-// fascia di profondità tra i pianeti (~-20/-40) e la nebulosa di sfondo (~-90/-105):
-// la nova si vede stagliarsi sul fondo senza essere confusa con l'uno o l'altra
-const Z_MIN = -55
-const Z_MAX = -85
+// fascia di profondità tra i pianeti e la nebulosa di sfondo: la nova si vede stagliarsi
+// sul fondo senza essere confusa con l'uno o l'altra
+const Z_MIN = zAt(118)
+const Z_MAX = zAt(181)
 
 const T_FLASH_IN = 0.15 // lampo iniziale, quasi istantaneo
 const T_HOLD = 0.4 // resta al massimo un attimo
-const T_END = 2.6 // durata totale: da qui il nucleo è spento e l'onda d'urto svanita
+const T_END = 2.6 // durata totale: da qui la stella è spenta e l'onda d'urto svanita
+const BURST_SPIN = 0.5 // rad/s: la stella gira piano mentre si spegne, come in un fumetto
 
 const MIN_INTERVAL_MS = 90000
 const MAX_INTERVAL_MS = 180000
 
-function randFloat(min, max) {
-  return min + Math.random() * (max - min)
+// stella a punte da fumetto: un poligono con le punte alternate lunghe e corte, a strati di
+// colore piatto e con il contorno scuro, al posto del bagliore sfumato. Generata una sola
+// volta (cache di modulo) e riusata da tutte le nova
+let burstTextureCache = null
+function getBurstTexture() {
+  if (burstTextureCache) return burstTextureCache
+  const size = 256
+  const { canvas, ctx } = createCanvas(size)
+  const c = size / 2
+
+  const drawBurst = (outer, inner, points, color) => {
+    ctx.beginPath()
+    for (let i = 0; i < points * 2; i++) {
+      const r = i % 2 === 0 ? outer : inner
+      const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2
+      ctx.lineTo(c + Math.cos(a) * r, c + Math.sin(a) * r)
+    }
+    ctx.closePath()
+    ctx.fillStyle = color
+    ctx.fill()
+    return ctx
+  }
+
+  ctx.lineJoin = 'round'
+  ctx.strokeStyle = palette.outline
+  ctx.lineWidth = 6
+  drawBurst(size * 0.46, size * 0.22, 10, palette.lightYellow).stroke()
+  drawBurst(size * 0.3, size * 0.15, 10, palette.cream)
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(c, c, size * 0.1, 0, Math.PI * 2)
+  ctx.fill()
+
+  burstTextureCache = new CanvasTexture(canvas)
+  return burstTextureCache
 }
 
-// texture generate una sola volta (cache di modulo, non per istanza) e riusate da tutte le
-// nova: un cerchio pieno con bordo netto si legge come "forma", un gradiente radiale che sfuma
-// a zero si legge come "luce". Stesso trucco per l'onda d'urto: invece di un anello disegnato
-// (bordi netti), una fascia luminosa sfumata su entrambi i lati.
-let glowTextureCache = null
-function getGlowTexture() {
-  if (glowTextureCache) return glowTextureCache
-  const size = 128
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  // molti stop ravvicinati invece di un salto netto 0→1: una curva a campana morbida invece
-  // di un disco pieno con un bordo (anche sfumato) troppo definito
-  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  gradient.addColorStop(0, 'rgba(255,255,255,1)')
-  gradient.addColorStop(0.2, 'rgba(255,255,255,0.7)')
-  gradient.addColorStop(0.4, 'rgba(255,255,255,0.42)')
-  gradient.addColorStop(0.6, 'rgba(255,255,255,0.22)')
-  gradient.addColorStop(0.8, 'rgba(255,255,255,0.08)')
-  gradient.addColorStop(1, 'rgba(255,255,255,0)')
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, size, size)
-  glowTextureCache = new CanvasTexture(canvas)
-  return glowTextureCache
-}
-
+// onda d'urto: un anello netto con il contorno, non una fascia sfumata
 let ringTextureCache = null
 function getRingTexture() {
   if (ringTextureCache) return ringTextureCache
-  const size = 128
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  // stessa idea del bagliore: niente tratto "pieno" costante, un unico picco morbido con
-  // discesa graduale sui due lati, altrimenti si rivede una linea disegnata invece di un'onda
-  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  gradient.addColorStop(0, 'rgba(255,255,255,0)')
-  gradient.addColorStop(0.5, 'rgba(255,255,255,0)')
-  gradient.addColorStop(0.62, 'rgba(255,255,255,0.25)')
-  gradient.addColorStop(0.7, 'rgba(255,255,255,0.5)')
-  gradient.addColorStop(0.78, 'rgba(255,255,255,0.25)')
-  gradient.addColorStop(0.92, 'rgba(255,255,255,0)')
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, size, size)
+  const size = 256
+  const { canvas, ctx } = createCanvas(size)
+  const c = size / 2
+
+  ctx.strokeStyle = palette.outline
+  ctx.lineWidth = 14
+  ctx.beginPath()
+  ctx.arc(c, c, size * 0.44, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.strokeStyle = palette.ice
+  ctx.lineWidth = 8
+  ctx.stroke()
+
   ringTextureCache = new CanvasTexture(canvas)
   return ringTextureCache
 }
 
-// evento fisso in world space (non si muove): un lampo che sale in un istante, resta acceso
-// un attimo, poi si spegne mentre un'onda d'urto si espande e sfuma. Texture generate al volo
-// (getGlowTexture/getRingTexture), non caricate da file: niente useTexture/Suspense, zero
-// asset richiesti.
+// evento fisso nel mondo (non si muove): la stella esplode in un istante, resta accesa un
+// attimo, poi si spegne girando piano mentre un'onda d'urto si allarga e svanisce
 function NovaActor({ reduced, onDone }) {
   const billboardRef = useRef()
-  const glowRef = useRef()
-  const coreRef = useRef()
+  const burstRef = useRef()
   const ringRef = useRef()
   const { camera } = useThree()
 
   const elapsed = useRef(0)
   const done = useRef(false)
   const forwardRef = useRef(new Vector3())
-  const paramsRef = useRef(null) // { coreScale, glowScale, ringMaxScale }, generati una sola volta
+  const paramsRef = useRef(null) // { burstScale, ringMaxScale }, generati una sola volta
 
   useFrame((state, rawDelta) => {
     if (done.current) return
 
-    // il flash è un evento fotosensibile: reduced motion lo salta del tutto, non solo lo accorcia
+    // il lampo è un evento fotosensibile: reduced motion lo salta del tutto, non solo lo accorcia
     if (reduced || elapsed.current >= T_END) {
       done.current = true
       onDone()
@@ -107,100 +112,63 @@ function NovaActor({ reduced, onDone }) {
       const halfH = height / 2
       if (halfW < 0.5 || halfH < 0.5) return // canvas non ancora dimensionato
 
-      // stesso calcolo di parallasse di SpaceWanderer/Ufo: il centro di ciò che si vede a
-      // questa z non è l'origine, è dove punta davvero la camera in questo momento
-      camera.getWorldDirection(forwardRef.current)
-      const planeDist = (z - camera.position.z) / forwardRef.current.z
-      const cx = camera.position.x + forwardRef.current.x * planeDist
-      const cy = camera.position.y + forwardRef.current.y * planeDist
-
+      const { x: cx, y: cy } = viewCenterAt(camera, z, forwardRef.current)
       billboardRef.current.position.set(
         cx + randFloat(-0.7 * halfW, 0.7 * halfW),
         cy + randFloat(-0.7 * halfH, 0.7 * halfH),
         z
       )
       paramsRef.current = {
-        coreScale: halfH * 0.12,
-        glowScale: halfH * 0.4,
-        ringMaxScale: halfH * 1.0,
+        burstScale: halfH * 0.22,
+        ringMaxScale: halfH * 0.9,
       }
     }
 
-    const { coreScale, glowScale, ringMaxScale } = paramsRef.current
+    const { burstScale, ringMaxScale } = paramsRef.current
     const t = elapsed.current
 
-    let coreOpacity
-    let coreMul
+    let burstOpacity
+    let burstMul
     if (t <= T_FLASH_IN) {
       const p = t / T_FLASH_IN
-      coreOpacity = p
-      coreMul = 0.15 + p * 0.85
+      burstOpacity = p
+      burstMul = 0.2 + p * 0.8
     } else if (t <= T_HOLD) {
-      coreOpacity = 1
-      coreMul = 1
+      burstOpacity = 1
+      burstMul = 1
     } else {
       const p = (t - T_HOLD) / (T_END - T_HOLD)
-      coreOpacity = 1 - p
-      coreMul = 1 + p * 0.5 // continua a "espandersi" leggermente mentre si spegne
+      burstOpacity = 1 - p
+      burstMul = 1 - p * 0.6 // si richiude mentre si spegne
     }
 
-    // l'onda d'urto parte insieme al lampo e impiega tutta la vita dell'evento per espandersi
+    // l'onda d'urto parte insieme al lampo e impiega tutta la vita dell'evento per allargarsi
     const tRing = Math.min(Math.max((t - T_FLASH_IN) / (T_END - T_FLASH_IN), 0), 1)
     const ringEase = 1 - (1 - tRing) ** 3
-    const ringOpacity = (1 - tRing) * 0.6
 
-    coreRef.current.scale.setScalar(coreScale * coreMul)
-    coreRef.current.material.opacity = coreOpacity
-    glowRef.current.scale.setScalar(glowScale * coreMul)
-    glowRef.current.material.opacity = coreOpacity * 0.6
-    ringRef.current.scale.setScalar(ringMaxScale * (0.25 + ringEase * 0.75))
-    ringRef.current.material.opacity = ringOpacity
+    burstRef.current.scale.setScalar(burstScale * burstMul)
+    burstRef.current.rotation.z += delta * BURST_SPIN
+    burstRef.current.material.opacity = burstOpacity
+    ringRef.current.scale.setScalar(ringMaxScale * (0.2 + ringEase * 0.8))
+    ringRef.current.material.opacity = (1 - tRing) * 0.8
   })
 
   return (
     <Billboard ref={billboardRef} position={[0, 0, 0]}>
-      <mesh ref={glowRef}>
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={getGlowTexture()}
-          color="#9fd8ff"
-          transparent
-          opacity={0}
-          toneMapped={false}
-          blending={AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh ref={coreRef}>
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={getGlowTexture()}
-          color="#ffffff"
-          transparent
-          opacity={0}
-          toneMapped={false}
-          blending={AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
       <mesh ref={ringRef}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={getRingTexture()}
-          color="#bfe9ff"
-          transparent
-          opacity={0}
-          toneMapped={false}
-          blending={AdditiveBlending}
-          depthWrite={false}
-        />
+        <meshBasicMaterial map={getRingTexture()} transparent opacity={0} toneMapped={false} depthWrite={false} fog={false} />
+      </mesh>
+      <mesh ref={burstRef} position={[0, 0, 0.01]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial map={getBurstTexture()} transparent opacity={0} toneMapped={false} depthWrite={false} fog={false} />
       </mesh>
     </Billboard>
   )
 }
 
 // orchestratore: stesso schema di ShootingStar/Ufo. Evento molto più raro di entrambi (90-180s):
-// deve restare una sorpresa "wow", non diventare un tormentone. Cap a una nova attiva per volta.
+// deve restare una sorpresa, non diventare un tormentone. Una nova attiva per volta
 export default function Nova({ reduced }) {
   const [novas, setNovas] = useState([])
   const nextId = useRef(0)
@@ -211,7 +179,7 @@ export default function Nova({ reduced }) {
     },
     MIN_INTERVAL_MS,
     MAX_INTERVAL_MS,
-    { enabled: !reduced }
+    { enabled: !reduced, name: 'nova' }
   )
 
   const handleDone = useCallback((id) => {
