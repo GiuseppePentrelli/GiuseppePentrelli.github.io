@@ -6,6 +6,7 @@ import PortholeOverlay from '../components/PortholeOverlay'
 import ReducedMotionToggle from '../components/ReducedMotionToggle'
 import ServicesCarousel from '../components/ServicesCarousel'
 import Skills, { SkillCard } from '../components/Skills'
+import ProjectConstellation from '../components/projects/ProjectConstellation'
 
 export default function LabDom({ item, reduced, onToggle }) {
   const frameRef = useRef(null)
@@ -31,6 +32,7 @@ export default function LabDom({ item, reduced, onToggle }) {
   if (item.kind === 'image') {
     return <img className="lab-asset" src={`/media/${item.asset}`} alt={item.title} loading="lazy" decoding="async" />
   }
+  if (item.demo === 'projects') return <ProjectConstellation reduced={reduced} />
   if (item.demo === 'porthole') return <div className="lab-local-overlay"><PortholeOverlay /></div>
   if (item.demo === 'motion-toggle') return <div className="lab-local-control"><ReducedMotionToggle reduced={reduced} onToggle={onToggle} /></div>
 

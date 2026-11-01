@@ -171,6 +171,17 @@
   aspect-ratio: 9 / 16;
 }
 
+.lab-preview--interactive {
+  aspect-ratio: auto;
+  min-height: 760px;
+}
+
+.lab-preview--interactive .lab-dom {
+  position: relative;
+  inset: auto;
+  height: auto;
+}
+
 .lab-card--expanded .lab-preview--portrait {
   width: min(100%, 450px);
   margin-inline: auto;

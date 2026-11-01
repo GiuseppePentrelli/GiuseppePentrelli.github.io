@@ -4,6 +4,7 @@ import { skillGroups } from '../data/portfolio'
 export const categories = ['Tutti', 'Pianeti', 'Cielo', 'Fenomeni', 'Visitatori', 'Esperimenti', 'Interfaccia', 'Illustrazioni', 'Archivio']
 
 export const catalog = [
+  { id: 'projects', title: 'Costellazione dei progetti', description: 'Stelle selezionabili, filtri e connessioni tra i progetti. Esperimento ispirato al grafo di Obsidian.', category: 'Interfaccia', kind: 'dom', demo: 'projects', wide: true, interactive: true, status: 'review', source: 'src/components/projects/ProjectConstellation.jsx' },
   ...planets.map((planet) => ({
     id: planet.name,
     title: planet.name[0].toUpperCase() + planet.name.slice(1),

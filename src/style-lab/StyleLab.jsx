@@ -20,7 +20,7 @@ function LabCard({ item, reduced, onToggle, format }) {
   const [version, setVersion] = useState(0)
   const [manual, setManual] = useState(false)
   const [finished, setFinished] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(Boolean(item.wide))
   const [failed, setFailed] = useState(false)
   const onDone = useCallback(() => setFinished(true), [])
   const onError = useCallback(() => setFailed(true), [])
@@ -50,7 +50,7 @@ function LabCard({ item, reduced, onToggle, format }) {
 
   return (
     <article id={`lab-${item.id}`} className={`lab-card${expanded ? ' lab-card--expanded' : ''}`}>
-      <div ref={previewRef} className={`lab-preview lab-preview--${format}`} role="group" aria-label={`Anteprima: ${item.title}`}>
+      <div ref={previewRef} className={`lab-preview lab-preview--${format}${item.interactive ? ' lab-preview--interactive' : ''}`} role="group" aria-label={`Anteprima: ${item.title}`}>
         {visible && (
           <>
             <View key={`${version}-${format}-${expanded}`} className="lab-view" aria-hidden="true">
@@ -60,9 +60,9 @@ function LabCard({ item, reduced, onToggle, format }) {
                 </Suspense>
               </PreviewBoundary>
             </View>
-            {dom && <div key={version} className="lab-dom"><LabDom item={item} reduced={reduced} onToggle={onToggle} /></div>}
           </>
         )}
+        {dom && (visible || item.interactive) && <div key={version} className="lab-dom"><LabDom item={item} reduced={reduced} onToggle={onToggle} /></div>}
         {failed && <p className="lab-preview-message" role="status">Anteprima non disponibile. Prova a riavviarla.</p>}
         {item.event && (finished || (item.id === 'nova' && !manual) || (reduced && !manual)) && !failed && (
           <button type="button" className="lab-play" onClick={restart} aria-label={`Riproduci ${item.title}`}>
@@ -91,7 +91,7 @@ export default function StyleLab() {
     const initial = new URLSearchParams(window.location.search).get('categoria')
     return categories.includes(initial) ? initial : 'Tutti'
   })
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(() => new URLSearchParams(window.location.search).get('cerca') || '')
   const [format, setFormat] = useState('landscape')
   const search = query.trim().toLocaleLowerCase('it')
   const items = catalog.filter((item) => (category === 'Tutti' || item.category === category) && `${item.title} ${item.description} ${item.source}`.toLocaleLowerCase('it').includes(search))
