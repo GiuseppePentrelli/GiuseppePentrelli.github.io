@@ -87,14 +87,14 @@ export default function CockpitIntro({ reduced }) {
           <picture>
             <source
               media="(max-aspect-ratio: 9/10)"
-              srcSet="/media/cockpit-novenix-mobile-v1.png"
+              srcSet="/media/cockpit-novenix-cartoon-mobile-v2.png"
               width="948"
               height="1659"
             />
             <img
               ref={imageRef}
               className="cockpit-intro__image"
-              src="/media/cockpit-novenix-v1.png"
+              src="/media/cockpit-novenix-cartoon-v2.png"
               width="1672"
               height="941"
               alt=""

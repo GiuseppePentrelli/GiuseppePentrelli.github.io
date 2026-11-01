@@ -134,7 +134,7 @@ function randomPass() {
 // un singolo passaggio del gruppetto: viaggia in linea retta da `start` a `end` in
 // `lifetime` secondi, comparendo/scomparendo gradualmente ai due estremi (stesso
 // principio della dissolvenza in profondità già usato prima), poi si smonta da sé
-function AsteroidPass({ start, end, lifetime, reduced, onDone }) {
+export function AsteroidPass({ start, end, lifetime, reduced, onDone }) {
   const rockRefs = useRef([])
   const identities = useMemo(() => Array.from({ length: COUNT }, (_, i) => createRockIdentity(i)), [])
   const geometries = useMemo(

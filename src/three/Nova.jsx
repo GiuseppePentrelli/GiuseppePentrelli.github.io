@@ -75,7 +75,7 @@ function getRingTexture() {
 // un attimo, poi si spegne mentre un'onda d'urto si espande e sfuma. Texture generate al volo
 // (getGlowTexture/getRingTexture), non caricate da file: niente useTexture/Suspense, zero
 // asset richiesti.
-function NovaActor({ reduced, onDone }) {
+export function NovaActor({ reduced, onDone }) {
   const billboardRef = useRef()
   const glowRef = useRef()
   const coreRef = useRef()

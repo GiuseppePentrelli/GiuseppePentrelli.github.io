@@ -34,7 +34,7 @@ function randomComet() {
 // una singola stella cadente: appare al punto `start` e si muove lungo `velocity`
 // lasciando una scia (Trail di drei), finché non esce dall'inquadratura della camera
 // (non dopo un tempo fisso: così la scia arriva sempre davvero fuori dallo schermo)
-function Comet({ start, velocity, reduced, onDone }) {
+export function Comet({ start, velocity, reduced, onDone }) {
   const meshRef = useRef()
   const elapsed = useRef(0)
   const done = useRef(false)

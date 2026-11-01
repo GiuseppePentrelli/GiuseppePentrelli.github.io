@@ -25,7 +25,7 @@ const MAX_INTERVAL_MS = 50000
 // "guardando" l'utente (il Billboard lo fa gratis, nessun lookAt da scrivere) oscillando un
 // po' a destra e sinistra, poi scappa a razzo e sparisce. Fasi scandite da un solo
 // elapsed.current dentro useFrame, stesso spirito di Comet in ShootingStar.jsx ma con più fasi.
-function UfoActor({ src, reduced, onDone }) {
+export function UfoActor({ src, reduced, onDone }) {
   const texture = useTexture(src)
   const billboardRef = useRef()
   const spinRef = useRef()
@@ -146,7 +146,7 @@ function UfoActor({ src, reduced, onDone }) {
     <Billboard ref={billboardRef} position={[0, 0, Z]}>
       <mesh ref={spinRef} visible={false}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={texture} transparent toneMapped={false} />
+        <meshBasicMaterial map={texture} transparent alphaTest={0.01} toneMapped={false} />
       </mesh>
     </Billboard>
   )

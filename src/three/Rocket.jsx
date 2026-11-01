@@ -111,7 +111,7 @@ function randomFlight(aspect) {
   }
 }
 
-function RocketActor({ start, end, arc, duration, scale, reduced, onDone }) {
+export function RocketActor({ start, end, arc, duration, scale, reduced, onDone }) {
   const groupRef = useRef()
   const rollRef = useRef()
   const flameRef = useRef()

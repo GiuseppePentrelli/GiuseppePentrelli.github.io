@@ -4,6 +4,8 @@ import PortholeOverlay from './components/PortholeOverlay'
 import JourneyIntro from './components/JourneyIntro'
 import About from './components/About'
 import CockpitIntro from './components/CockpitIntro'
+import ServicesCarousel from './components/ServicesCarousel'
+import Skills from './components/Skills'
 import { useReducedMotion } from './hooks/useReducedMotion'
 
 // la scena 3D (Three.js è quasi tutto il peso del sito) arriva in un file a parte: il titolo
@@ -23,6 +25,8 @@ function App() {
         <CockpitIntro reduced={reducedMotion} />
         <JourneyIntro />
         <About reduced={reducedMotion} />
+        <ServicesCarousel reduced={reducedMotion} />
+        <Skills reduced={reducedMotion} />
       </main>
       <PortholeOverlay />
     </div>

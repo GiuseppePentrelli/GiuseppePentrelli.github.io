@@ -97,6 +97,8 @@ export default function SpaceWanderer({
   avoidDistance = 2.8, // sotto questa distanza punta decisamente in verso opposto
   steerDistance = 4.5, // sotto questa distanza inizia a virare gradualmente
   turnRate = 3, // quanto in fretta (rad/s circa) la virata morbida raggiunge la direzione desiderata
+  initialAnchor,
+  reduced = false,
 }) {
   const texture = useTexture(src)
   const billboardRef = useRef()
@@ -115,7 +117,7 @@ export default function SpaceWanderer({
     // (asset da scaricare, canvas che si sta ancora dimensionando) il delta può essere
     // molto più grande del normale ~16ms — senza questo tetto, speed/rotationSpeed
     // moltiplicati per un delta enorme producono uno scatto enorme in un solo frame
-    const delta = Math.min(rawDelta, 0.1)
+    const delta = reduced ? 0 : Math.min(rawDelta, 0.1)
 
     const camera = state.camera
     const { width, height } = state.viewport.getCurrentViewport(camera, [0, 0, z])
@@ -144,6 +146,10 @@ export default function SpaceWanderer({
 
     if (!posRef.current) {
       const spawn = pickSafeSpawn(bounds, avoid, avoidDistance)
+      if (initialAnchor) {
+        spawn.x = cx + initialAnchor[0] * halfW
+        spawn.y = cy + initialAnchor[1] * halfH
+      }
       posRef.current = { x: spawn.x, y: spawn.y }
       headingRef.current = spawn.angle
       rotSpeedRef.current = (Math.random() < 0.5 ? -1 : 1) * rotationSpeed
@@ -231,7 +237,7 @@ export default function SpaceWanderer({
     <Billboard ref={billboardRef} position={[0, 0, z]}>
       <mesh ref={spinRef} visible={false}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={texture} transparent toneMapped={false} />
+        <meshBasicMaterial map={texture} transparent alphaTest={0.01} toneMapped={false} />
       </mesh>
     </Billboard>
   )

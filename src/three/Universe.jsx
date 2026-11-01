@@ -17,6 +17,7 @@ import Rocket from './Rocket'
 import BinaryStars from './BinaryStars'
 import Eclipse from './Eclipse'
 import RenderBudget from './RenderBudget'
+import SceneLighting from './SceneLighting'
 import { CAMERA_Z, FOV, zAt } from './layout'
 
 export default function Universe({ reducedMotion }) {
@@ -35,13 +36,7 @@ export default function Universe({ reducedMotion }) {
           renderizzare a 3x manderebbe in fumo le prestazioni senza benefici visibili */}
       <Canvas camera={{ position: [0, 0, CAMERA_Z], fov: FOV }} dpr={[1, 2]}>
         <RenderBudget />
-        {/* fog: le stelle lontane sfumano nel blu invece di restare tutte nitide - dà profondità */}
-        <fog attach="fog" args={['#081929', 17, 253]} />
-        {/* luci: ambientale bassa apposta, altrimenti il lato in ombra dei pianeti non si scurisce
-            mai abbastanza e ruotando non si vede la differenza tra lato illuminato e lato in ombra */}
-        <ambientLight intensity={0.12} color="#22456b" />
-        <directionalLight position={[10, 10, 10]} intensity={1.8} color="#ffd9a0" />
-        <directionalLight position={[-10, -4, -6]} intensity={0.15} color="#3f6ea5" />
+        <SceneLighting />
         <CameraRig reduced={reducedMotion} />
         {/* più lontana di tutto il resto: sfondo statico dietro le stelle */}
         <Nebula />

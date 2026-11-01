@@ -68,7 +68,7 @@ function randomPass(aspect) {
   }
 }
 
-function CometActor({ start, end, duration, halfH, reduced, onDone }) {
+export function CometActor({ start, end, duration, halfH, reduced, onDone }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
   const done = useRef(false)
