@@ -76,18 +76,21 @@ function useTypewriter(start, reduced) {
 function ConsoleText({ visible, reduced }) {
   const count = useTypewriter(visible, reduced)
   const fullLog = useMemo(() => renderLog(LOG_LENGTH), [])
+  const complete = count >= LOG_LENGTH
 
   return (
-    <>
-      <p className="sr-only">{fullLog}</p>
-      <div className="console-text grid" aria-hidden="true">
-        <p className="invisible col-start-1 row-start-1">{fullLog}</p>
-        <p className="col-start-1 row-start-1">
+    <div className="console-text grid">
+      <p className={`col-start-1 row-start-1${complete ? '' : ' console-text__full--typing'}`}>
+        {fullLog}
+        <span className={`console-cursor${complete ? '' : ' invisible'}`} aria-hidden="true">|</span>
+      </p>
+      {!complete && (
+        <p className="console-text__typing col-start-1 row-start-1" aria-hidden="true">
           {renderLog(count)}
           <span className="console-cursor">|</span>
         </p>
-      </div>
-    </>
+      )}
+    </div>
   )
 }
 
