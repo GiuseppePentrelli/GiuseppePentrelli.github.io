@@ -19,8 +19,7 @@ function App() {
         <Universe reducedMotion={reducedMotion} />
       </Suspense>
       <ReducedMotionToggle reduced={reducedMotion} onToggle={toggleReducedMotion} />
-      {/* z-10 = sopra al canvas 3D, che resta fermo dietro mentre la pagina scorre */}
-      <main className="portfolio-content relative z-10">
+      <main className="portfolio-content relative">
         <CockpitIntro reduced={reducedMotion} />
         <JourneyIntro />
         <About reduced={reducedMotion} />

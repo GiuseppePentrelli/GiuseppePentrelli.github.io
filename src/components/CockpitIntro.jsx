@@ -25,9 +25,13 @@ export default function CockpitIntro({ reduced }) {
       const approach = Math.min(1, progress / 0.85)
       const eased = approach * approach * (3 - 2 * approach)
       const image = imageRef.current
+      const visibility = approach === 1 ? 'hidden' : 'visible'
+      if (image.style.visibility !== visibility) {
+        sectionRef.current.firstElementChild.style.zIndex = approach === 1 ? 'auto' : '50'
+        image.style.visibility = visibility
+      }
       image.style.transform = reduced ? 'none' : `scale(${1 + progress * 3})`
       image.style.opacity = String(reduced ? 1 - approach : Math.min(1, (1 - approach) / 0.2))
-      image.style.visibility = approach === 1 ? 'hidden' : 'visible'
       title.style.transform = reduced || approach === 1
         ? 'none'
         : `translateY(${titleOffset * (1 - eased)}px) scale(${0.16 * Math.pow(6.25, eased)})`
