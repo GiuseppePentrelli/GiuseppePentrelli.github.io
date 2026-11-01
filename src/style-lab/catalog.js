@@ -1,7 +1,7 @@
 import { planets } from '../three/planetsData'
 import { skillGroups } from '../data/portfolio'
 
-export const categories = ['Tutti', 'Pianeti', 'Cielo', 'Fenomeni', 'Visitatori', 'Interfaccia', 'Illustrazioni', 'Archivio']
+export const categories = ['Tutti', 'Pianeti', 'Cielo', 'Fenomeni', 'Visitatori', 'Esperimenti', 'Interfaccia', 'Illustrazioni', 'Archivio']
 
 export const catalog = [
   ...planets.map((planet) => ({
@@ -38,6 +38,11 @@ export const catalog = [
   ].map(([id, title, asset]) => ({ id, title, category: 'Visitatori', kind: 'wanderer', asset, source: 'src/three/SpaceWanderer.jsx', description: 'Movimento e rotazione dello sprite originale.' })),
   { id: 'ufo', title: 'UFO', category: 'Visitatori', kind: 'ufo', source: 'src/three/Ufo.jsx', description: 'Ingresso, fluttuazione e fuga verso l’alto.', event: true },
   { id: 'rocket', title: 'Razzo 3D', category: 'Visitatori', kind: 'rocket', source: 'src/three/Rocket.jsx', description: 'Modello cartoon, rotazione e fiamma animata.', event: true },
+  ...[
+    ['space-station', 'Stazione spaziale', 'station', 'Anello abitato rotante, pannelli solari e stemma Novenix.', 'SpaceStation', 'approved'],
+    ['asteroid-rover', 'Rover sull’asteroide', 'rover', 'Sei ruote in movimento, testa orientabile e una piccola superficie da esplorare.', 'AsteroidRover', 'review'],
+    ['space-probe', 'Sonda esploratrice', 'probe', 'Pannelli solari, antenna orientabile e deriva nello spazio.', 'SpaceProbe', 'approved'],
+  ].map(([id, title, kind, description, component, status]) => ({ id, title, kind, description, status, category: 'Esperimenti', source: `src/three/experiments/${component}.jsx` })),
   ...[
     ['hero', 'Benvenuto', 'Titolo al neon, nome, avatar e frecce.', 'Hero'],
     ['journey', 'Introduzione al viaggio', 'Il titolo che apre il viaggio interstellare.', 'JourneyIntro'],

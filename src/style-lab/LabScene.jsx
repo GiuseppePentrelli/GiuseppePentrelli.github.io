@@ -19,6 +19,9 @@ import { CometActor } from '../three/GreatComet'
 import { RocketActor } from '../three/Rocket'
 import { UfoActor } from '../three/Ufo'
 import SceneLighting from '../three/SceneLighting'
+import SpaceStation from '../three/experiments/SpaceStation'
+import AsteroidRover from '../three/experiments/AsteroidRover'
+import SpaceProbe from '../three/experiments/SpaceProbe'
 import { CAMERA_Z, FOV, halfViewAt, isPortrait, placeAt, useAspect, zAt } from '../three/layout'
 
 function Centered({ anchor, portraitAnchor = anchor, distance, scale = 1, children }) {
@@ -63,6 +66,12 @@ function Specimen({ item, reduced, onDone }) {
     }
     case 'rocket':
       return <RocketActor start={[-halfW * 0.8, -halfH * 0.15, zAt(20)]} end={[halfW * 1.3, halfH * 0.2, zAt(20)]} arc={halfH * 0.1} duration={8} scale={halfH * 0.22} reduced={false} onDone={onDone} />
+    case 'station':
+      return <group position={[0, 0, zAt(10)]} scale={Math.min(1, aspect * 0.8)}><SpaceStation reduced={reduced} /></group>
+    case 'rover':
+      return <group position={[0, 0.25, zAt(11)]} scale={Math.min(1, aspect)}><AsteroidRover reduced={reduced} /></group>
+    case 'probe':
+      return <group position={[0, -0.2, zAt(9)]} scale={Math.min(1, aspect)}><SpaceProbe reduced={reduced} /></group>
     default: return null
   }
 }

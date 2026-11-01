@@ -13,13 +13,27 @@ export default function CameraRig({ reduced }) {
   const pointer = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
+    const mouseInput = window.matchMedia('(hover: hover) and (pointer: fine)')
     const onMove = (e) => {
+      if (e.pointerType !== 'mouse') return
       pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1
       pointer.current.y = (e.clientY / window.innerHeight) * 2 - 1
     }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    return () => window.removeEventListener('pointermove', onMove)
-  }, [])
+    const syncInput = () => {
+      pointer.current.x = 0
+      pointer.current.y = 0
+      window.removeEventListener('pointermove', onMove)
+      if (mouseInput.matches && !reduced) {
+        window.addEventListener('pointermove', onMove, { passive: true })
+      }
+    }
+    syncInput()
+    mouseInput.addEventListener('change', syncInput)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      mouseInput.removeEventListener('change', syncInput)
+    }
+  }, [reduced])
 
   useFrame((state, delta) => {
     // reduced motion: niente inseguimento del mouse, la camera resta ferma al centro

@@ -259,6 +259,17 @@
   color: var(--color-space-cyan);
 }
 
+.lab-card__status {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--color-space-lyellow);
+  font-size: 0.8rem;
+}
+
+.lab-card__status[data-status="approved"] {
+  color: var(--color-console-neon-green);
+}
+
 .lab-card__body > p {
   margin-top: 0.5rem;
   min-height: 3em;

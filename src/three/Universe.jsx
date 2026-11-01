@@ -18,6 +18,7 @@ import BinaryStars from './BinaryStars'
 import Eclipse from './Eclipse'
 import RenderBudget from './RenderBudget'
 import SceneLighting from './SceneLighting'
+import SpaceStructures from './SpaceStructures'
 import { CAMERA_Z, FOV, zAt } from './layout'
 
 export default function Universe({ reducedMotion }) {
@@ -50,6 +51,9 @@ export default function Universe({ reducedMotion }) {
         <Rocket reduced={reducedMotion} />
         <BinaryStars reduced={reducedMotion} />
         <Eclipse reduced={reducedMotion} />
+        <Suspense fallback={null}>
+          <SpaceStructures reduced={reducedMotion} />
+        </Suspense>
         {/* la cosa più vicina alla camera dopo l'UFO: dà la profondità quando la camera si muove */}
         <SpaceDust reduced={reducedMotion} />
         {/* Suspense: useTexture sospende il render finché l'immagine non è caricata */}

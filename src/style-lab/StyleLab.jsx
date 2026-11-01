@@ -73,6 +73,7 @@ function LabCard({ item, reduced, onToggle, format }) {
       </div>
       <div className="lab-card__body">
         <div className="lab-card__heading"><h2>{item.title}</h2><span>{item.category}</span></div>
+        {item.status && <span className="lab-card__status" data-status={item.status}>{item.status === 'approved' ? 'Approvato' : 'Da valutare'}</span>}
         <p>{item.description}</p>
         <div className="lab-card__actions">
           <button type="button" onClick={restart}>{item.event ? 'Riproduci' : 'Riavvia'}</button>
@@ -86,7 +87,10 @@ function LabCard({ item, reduced, onToggle, format }) {
 
 export default function StyleLab() {
   const [reduced, toggleReduced] = useReducedMotion()
-  const [category, setCategory] = useState('Tutti')
+  const [category, setCategory] = useState(() => {
+    const initial = new URLSearchParams(window.location.search).get('categoria')
+    return categories.includes(initial) ? initial : 'Tutti'
+  })
   const [query, setQuery] = useState('')
   const [format, setFormat] = useState('landscape')
   const search = query.trim().toLocaleLowerCase('it')
