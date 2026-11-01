@@ -73,10 +73,26 @@ function useTypewriter(start, reduced) {
   return reduced ? LOG_LENGTH : count
 }
 
-export default function About({ reduced }) {
-  const [ref, visible] = useInView({ threshold: 0.35 })
+function ConsoleText({ visible, reduced }) {
   const count = useTypewriter(visible, reduced)
   const fullLog = useMemo(() => renderLog(LOG_LENGTH), [])
+
+  return (
+    <>
+      <p className="sr-only">{fullLog}</p>
+      <div className="console-text grid" aria-hidden="true">
+        <p className="invisible col-start-1 row-start-1">{fullLog}</p>
+        <p className="col-start-1 row-start-1">
+          {renderLog(count)}
+          <span className="console-cursor">|</span>
+        </p>
+      </div>
+    </>
+  )
+}
+
+export default function About({ reduced }) {
+  const [ref, visible] = useInView({ threshold: 0.35 })
 
   return (
     <section
@@ -122,17 +138,7 @@ export default function About({ reduced }) {
             <h2 id="about-title" className="console-title">
               Log di sistema: Giuseppe v. 1.0
             </h2>
-            {/* il testo intero per i lettori di schermo; quello che si scrive è solo da vedere */}
-            <p className="sr-only">{fullLog}</p>
-            {/* due copie sovrapposte: quella invisibile tiene già l'altezza del testo finito,
-                così la scheda sotto non scende mentre il log si scrive */}
-            <div className="console-text grid" aria-hidden="true">
-              <p className="invisible col-start-1 row-start-1">{fullLog}</p>
-              <p className="col-start-1 row-start-1">
-                {renderLog(count)}
-                <span className="console-cursor">|</span>
-              </p>
-            </div>
+            <ConsoleText visible={visible} reduced={reduced} />
           </div>
 
           <div className="mission-card mt-6">

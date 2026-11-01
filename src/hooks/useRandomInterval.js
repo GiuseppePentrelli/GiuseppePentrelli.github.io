@@ -24,14 +24,23 @@ export function useRandomInterval(callback, minMs, maxMs, { enabled = true, name
 
     let timeoutId
     const schedule = () => {
+      if (document.hidden) return
       const delay = min + Math.random() * (max - min)
       timeoutId = setTimeout(() => {
         callbackRef.current()
         schedule()
       }, delay)
     }
+    const onVisibilityChange = () => {
+      clearTimeout(timeoutId)
+      schedule()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
     schedule()
 
-    return () => clearTimeout(timeoutId)
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [min, max, enabled])
 }

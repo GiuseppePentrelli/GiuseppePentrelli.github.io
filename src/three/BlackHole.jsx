@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
@@ -128,6 +128,11 @@ export default function BlackHole({ reduced }) {
   const portrait = isPortrait(aspect)
   const diskTexture = useMemo(() => createAccretionDiskTexture(), [])
   const coreTexture = useMemo(() => createCoreTexture(), [])
+
+  useEffect(() => () => {
+    diskTexture.dispose()
+    coreTexture.dispose()
+  }, [diskTexture, coreTexture])
 
   useFrame((_, delta) => {
     if (reduced || !diskRef.current) return

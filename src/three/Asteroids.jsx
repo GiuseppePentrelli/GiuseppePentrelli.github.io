@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { createToonGradient, createCraterTexture } from './planetTextures'
@@ -145,6 +145,11 @@ function AsteroidPass({ start, end, lifetime, reduced, onDone }) {
   const instances = useMemo(() => Array.from({ length: COUNT }, createRockInstance), [])
   const elapsed = useRef(0)
   const done = useRef(false)
+
+  useEffect(() => () => {
+    identities.forEach(({ craterMap }) => craterMap.dispose())
+    gradientMap.dispose()
+  }, [identities, gradientMap])
 
   useFrame((_, delta) => {
     if (done.current) return

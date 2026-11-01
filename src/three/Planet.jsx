@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
@@ -38,6 +38,11 @@ export default function Planet({
   const gradientMap = useMemo(() => createToonGradient(4), [])
   const glowMap = useMemo(() => createGlowTexture(glowColor), [glowColor])
   const ringMap = useMemo(() => (ring ? createRingTexture(ring.colors) : null), [ring])
+
+  useEffect(() => () => surfaceMap.dispose(), [surfaceMap])
+  useEffect(() => () => gradientMap.dispose(), [gradientMap])
+  useEffect(() => () => glowMap.dispose(), [glowMap])
+  useEffect(() => () => ringMap?.dispose(), [ringMap])
 
   // posizione di partenza sull'orbita (serve anche se reduced motion tiene tutto fermo)
   const startPosition = [

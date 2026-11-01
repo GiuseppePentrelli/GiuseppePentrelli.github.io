@@ -11,6 +11,8 @@ export default function CockpitIntro({ reduced }) {
     let start = 0
     let distance = 1
     let titleOffset = 0
+    let previousProgress = -1
+    let previousReveal = -1
     const hero = heroRef.current
     const title = hero.querySelector('.hero-enter')
     const details = [...hero.querySelector('header').children].slice(1)
@@ -18,6 +20,8 @@ export default function CockpitIntro({ reduced }) {
     const render = () => {
       frame = 0
       const progress = Math.min(1, Math.max(0, (window.scrollY - start) / distance))
+      if (progress === previousProgress) return
+      previousProgress = progress
       const approach = Math.min(1, progress / 0.85)
       const eased = approach * approach * (3 - 2 * approach)
       const image = imageRef.current
@@ -29,11 +33,16 @@ export default function CockpitIntro({ reduced }) {
         : `translateY(${titleOffset * (1 - eased)}px) scale(${0.16 * Math.pow(6.25, eased)})`
       const revealProgress = Math.min(1, Math.max(0, (progress - 0.35) / 0.45))
       const reveal = revealProgress * revealProgress * (3 - 2 * revealProgress)
-      details.forEach((element) => {
-        element.style.opacity = String(reveal)
-        element.style.visibility = reveal === 0 ? 'hidden' : 'visible'
-        element.inert = reveal === 0
-      })
+      if (reveal !== previousReveal) {
+        details.forEach((element) => {
+          element.style.opacity = String(reveal)
+          if ((reveal === 0) !== (previousReveal === 0) || previousReveal === -1) {
+            element.style.visibility = reveal === 0 ? 'hidden' : 'visible'
+            element.inert = reveal === 0
+          }
+        })
+        previousReveal = reveal
+      }
     }
 
     const measure = () => {
@@ -43,6 +52,7 @@ export default function CockpitIntro({ reduced }) {
       titleOffset = Math.max(-64, Math.min(64,
         window.innerHeight * 0.43 - (title.offsetTop + title.offsetHeight / 2),
       ))
+      previousProgress = -1
       render()
     }
 

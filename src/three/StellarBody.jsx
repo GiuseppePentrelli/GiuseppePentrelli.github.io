@@ -86,8 +86,8 @@ const coronaFragment = `
   void main() {
     vec2 p = (vUv - 0.5) * 10.0;
     float r = length(p);
-    float angle = atan(p.y, p.x);
-    vec3 direction = vec3(cos(angle), sin(angle), uTime * 0.025);
+    if (r <= 0.96 || r >= 5.0) discard;
+    vec3 direction = vec3(p / r, uTime * 0.025);
     float stream = turbulence(direction * 9.0 + vec3(0.0, 0.0, r * 0.65));
     float rays = pow(stream, 2.0) * 2.8;
     float rim = exp(-abs(r - 1.015) * 24.0) * 0.85;

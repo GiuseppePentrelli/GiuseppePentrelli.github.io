@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
 import { createSoftGlowTexture } from './planetTextures'
@@ -18,6 +18,8 @@ const CLOUDS = [
 export default function Nebula() {
   const aspect = useAspect()
   const textures = useMemo(() => CLOUDS.map((cloud) => createSoftGlowTexture(cloud.color)), [])
+
+  useEffect(() => () => textures.forEach((texture) => texture.dispose()), [textures])
 
   return (
     <>

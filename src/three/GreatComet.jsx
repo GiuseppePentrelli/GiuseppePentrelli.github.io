@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
@@ -74,6 +74,11 @@ function CometActor({ start, end, duration, halfH, reduced, onDone }) {
   const done = useRef(false)
   const gradientMap = useMemo(() => createToonGradient(4), [])
   const glowMap = useMemo(() => createGlowTexture(palette.ice, [[1, 0.18], [0.72, 0.32]]), [])
+
+  useEffect(() => () => {
+    gradientMap.dispose()
+    glowMap.dispose()
+  }, [gradientMap, glowMap])
 
   const head = halfH * HEAD_RATIO
   const tail = halfH * TAIL_RATIO

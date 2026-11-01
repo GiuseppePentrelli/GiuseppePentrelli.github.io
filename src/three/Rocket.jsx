@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Outlines } from '@react-three/drei'
 import * as THREE from 'three'
@@ -46,6 +46,8 @@ function RocketModel({ flameRef }) {
   const body = useMemo(() => new THREE.LatheGeometry(BODY_PROFILE, 32), [])
   const nose = useMemo(() => new THREE.LatheGeometry(NOSE_PROFILE, 32), [])
   const fin = useMemo(() => createFinGeometry(), [])
+
+  useEffect(() => () => gradientMap.dispose(), [gradientMap])
 
   return (
     <group>
