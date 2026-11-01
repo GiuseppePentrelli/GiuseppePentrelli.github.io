@@ -70,17 +70,25 @@ export default function CockpitIntro({ reduced }) {
           <Hero reduced={reduced} />
         </div>
         <div className="cockpit-intro__cabin" aria-hidden="true">
-          <img
-            ref={imageRef}
-            className="cockpit-intro__image"
-            src="/media/cockpit-novenix-v1.png"
-            width="1672"
-            height="941"
-            alt=""
-            fetchPriority="high"
-            decoding="async"
-            draggable="false"
-          />
+          <picture>
+            <source
+              media="(max-aspect-ratio: 9/10)"
+              srcSet="/media/cockpit-novenix-mobile-v1.png"
+              width="948"
+              height="1659"
+            />
+            <img
+              ref={imageRef}
+              className="cockpit-intro__image"
+              src="/media/cockpit-novenix-v1.png"
+              width="1672"
+              height="941"
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+              draggable="false"
+            />
+          </picture>
         </div>
       </div>
     </section>
