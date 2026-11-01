@@ -9,6 +9,23 @@
   font-display: swap;
 }
 
+/* Space Mono self-hosted (licenza OFL): il font della console nella sezione Chi sono */
+@font-face {
+  font-family: "Space Mono";
+  src: url("/fonts/space-mono-400-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  src: url("/fonts/space-mono-700-latin.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* palette presa dal sito originale, rinominata per il restyling */
 @theme {
   --color-space-blue: rgb(8, 25, 41);
@@ -20,7 +37,18 @@
   --color-space-cyan: rgb(0, 255, 255);
   --color-console-gray: rgb(55, 71, 79);
 
+  /* la console dell'originale (sezione Chi sono): pannelli scuri e neon */
+  --color-console-dark: #1a232e;
+  --color-console-panel: #263238;
+  --color-console-card: #0b1a27;
+  --color-console-neon-blue: #00e5ff;
+  --color-console-neon-cyan: #00bcd4;
+  --color-console-neon-green: #c5e1a5;
+  --color-console-neon-data: #a5d6a7;
+  --color-console-neon-aqua: #4db6ac;
+
   --font-display: "Anta", sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
 }
 
 body {
@@ -32,6 +60,15 @@ body {
 :root {
   /* distanza minima dagli angoli/bordi dell'oblò per gli elementi fixed (bottoni, ecc.) */
   --porthole-safe-margin: 3rem;
+  /* ease-out deciso per ciò che entra in scena: parte veloce e rallenta arrivando */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* i link interni (#viaggio) scorrono morbidi, ma solo se il sistema non chiede meno movimento */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* overlay "oblò navicella": vignettatura ai bordi + riflesso vetro */
@@ -133,9 +170,125 @@ body {
   }
 }
 
-/* salvata per più avanti: titleSpaceLift nell'originale non è sull'h1, è l'effetto hover
-   delle skill-card (.skillsCard:hover, .skillsCard:hover h3/h4) e .main-title è lo stile
-   degli h2 di sezione (intro, skills, progetti, contatti) — nessuno dei due esiste ancora qui */
+/* entrata dell'hero al caricamento: titolo, riga, avatar e frecce salgono di poco e
+   compaiono uno dopo l'altro (90ms fra l'uno e l'altro, l'ordine lo dà --i nel JSX) */
+.hero-enter {
+  animation: heroEnter 700ms var(--ease-out) both;
+  animation-delay: calc(150ms + var(--i, 0) * 90ms);
+}
+
+@keyframes heroEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* reduced motion: niente spostamento, resta solo la dissolvenza */
+.no-motion .hero-enter,
+.hero-enter.no-motion {
+  animation: heroFade 250ms ease both;
+}
+
+@keyframes heroFade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* la riga con nome e ruolo passa sopra la scena (buco nero, nebulose): un'ombra scura la
+   tiene leggibile anche sopra le zone chiare */
+.hero-subtitle {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 10px rgba(8, 25, 41, 0.9);
+}
+
+/* l'avatar galleggia piano, come tutto quello che sta nello spazio */
+.hero-avatar {
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
+  animation: avatarFloat 6s ease-in-out infinite;
+}
+
+.no-motion .hero-avatar {
+  animation: none;
+}
+
+@keyframes avatarFloat {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* frecce "scendi" dell'originale: due colonne di tre > ruotati, che si accendono e si spengono
+   in sequenza dall'alto verso il basso */
+.scroll-down {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 2rem;
+  text-decoration: none;
+}
+
+.scroll-down__column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 2.5rem;
+  height: 6rem;
+}
+
+.scroll-down__tip {
+  font-size: 2.8rem;
+  line-height: 1;
+  color: var(--color-space-cyan);
+  opacity: 0.2;
+  transform: rotate(90deg);
+  animation: arrowFade 1.5s ease-in-out infinite;
+}
+
+.scroll-down__tip:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.scroll-down__tip:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes arrowFade {
+  0% {
+    opacity: 0;
+    transform: rotate(90deg) translateY(-10px);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(90deg) translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(90deg) translateY(10px);
+  }
+}
+
+/* il passaggio del mouse solo dove esiste davvero: sul touch un tap lo lascerebbe acceso */
+@media (hover: hover) and (pointer: fine) {
+  .scroll-down:hover .scroll-down__tip {
+    color: #6ff;
+  }
+}
+
+.scroll-down:focus-visible {
+  outline: 2px solid var(--color-space-cyan);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.no-motion .scroll-down__tip {
+  animation: none;
+  opacity: 0.6;
+}
+
+/* Stile degli h2 di sezione dell'originale (intro, skills, progetti, contatti). */
 .main-title {
   font-size: clamp(20px, 6vw, 60px);
 
@@ -151,46 +304,239 @@ body {
     0 0 20px rgba(255, 72, 0, .8),
     0 0 40px rgba(255, 72, 0, .5);
   z-index: 2;
-  animation: titleSpaceLift 900ms ease-out forwards;
 }
 
-/* reduced motion: niente lift/tilt, il titolo compare direttamente fermo */
-.main-title.no-motion {
-  animation: none;
+/* ===== SEZIONE CHI SONO ===== */
+
+/* la foto nel cerchio ciano, come nell'originale. --frame è il lato della cornice: tutto
+   quello che orbita attorno ne prende una frazione, così sul telefono si restringe insieme */
+.astro-frame {
+  --frame: min(500px, 78vw);
+  position: relative;
+  width: var(--frame);
+  height: var(--frame);
+  padding: 10px;
+  border: 4px solid var(--color-space-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent);
 }
 
-/* keyframes generici: solleva, inclina, skew e bagliore */
-@keyframes titleSpaceLift {
+/* riflesso sul vetro del bordo */
+.astro-frame::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  z-index: 11;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  border-top: 2px solid rgba(255, 255, 255, 0.4);
+  border-left: 2px solid rgba(255, 255, 255, 0.4);
+  transform: rotate(25deg);
+  pointer-events: none;
+}
+
+.orbiter {
+  --orbit: calc(var(--frame) * var(--radius));
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  width: calc(var(--frame) * var(--size));
+  height: calc(var(--frame) * var(--size));
+  margin: calc(var(--frame) * var(--size) / -2);
+  opacity: 0.9;
+  animation: orbitOscillate 18s linear infinite;
+}
+
+/* giro completo attorno alla foto, con un'oscillazione su e giù */
+@keyframes orbitOscillate {
   0% {
-    transform: none;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
-    filter: brightness(1);
+    transform: rotate(0deg) translateX(var(--orbit)) translateY(0);
   }
 
-  35% {
-    transform: translateY(-10px) rotateX(9deg) rotateZ(-3deg) skewX(-2deg) scale(1.03);
-    text-shadow:
-      0 0 8px rgba(0, 255, 255, 0.12),
-      0 0 18px rgba(0, 255, 128, 0.08),
-      3px 3px 6px rgba(0, 0, 0, 0.45);
-    filter: brightness(1.04);
+  25% {
+    transform: rotate(90deg) translateX(var(--orbit)) translateY(-10px);
   }
 
-  65% {
-    transform: translateY(-7px) rotateX(6deg) rotateZ(1deg) skewX(0deg) scale(1.025);
-    text-shadow:
-      0 0 10px rgba(0, 255, 255, 0.14),
-      0 0 22px rgba(0, 255, 128, 0.10),
-      2px 2px 5px rgba(0, 0, 0, 0.42);
-    filter: brightness(1.03);
+  50% {
+    transform: rotate(180deg) translateX(var(--orbit)) translateY(0);
+  }
+
+  75% {
+    transform: rotate(270deg) translateX(var(--orbit)) translateY(10px);
   }
 
   100% {
-    transform: translateY(-9px) rotateX(6deg) rotateZ(0deg) skewX(-1deg) scale(1.03);
-    text-shadow:
-      0 0 12px rgba(0, 255, 255, 0.16),
-      0 0 26px rgba(0, 255, 128, 0.12),
-      2px 2px 5px rgba(0, 0, 0, 0.4);
-    filter: brightness(1.03);
+    transform: rotate(360deg) translateX(var(--orbit)) translateY(0);
   }
+}
+
+/* reduced motion: le orbite si fermano dove sono (sparse, grazie ai ritardi negativi) */
+.no-motion .orbiter {
+  animation-play-state: paused;
+}
+
+/* la console dell'astronave */
+.console {
+  background-color: var(--color-console-dark);
+  border: 4px solid var(--color-console-gray);
+  border-radius: 15px;
+  padding: 20px;
+  color: var(--color-console-neon-green);
+  box-shadow: 0 0 30px rgba(0, 200, 255, 0.15);
+}
+
+.console-screen {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  padding: 15px;
+  background: linear-gradient(180deg, #001018 0%, #001a24 100%);
+  border: 2px solid var(--color-console-neon-cyan);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+/* la griglia del circuito che scorre: nell'originale si animava background-position, che
+   ridisegna tutto a ogni frame; qui si sposta il livello con transform, che costa molto meno */
+.console-screen::before {
+  content: "";
+  position: absolute;
+  inset: -20px 0 0 -20px;
+  background-image:
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
+  animation: circuitMove 2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes circuitMove {
+  to {
+    transform: translate(20px, 20px);
+  }
+}
+
+.console-screen > * {
+  position: relative;
+}
+
+.console-title {
+  margin-bottom: 1rem;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed rgba(0, 229, 255, 0.5);
+  color: var(--color-console-neon-blue);
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.console-text {
+  line-height: 1.6;
+}
+
+.console-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--color-space-cyan);
+  animation: blinkCursor 0.8s steps(1) infinite;
+}
+
+@keyframes blinkCursor {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* scheda missione: il bagliore pulsante dell'originale animava box-shadow (un ridisegno a
+   ogni frame); qui il bagliore sta in un livello a parte e si anima solo la sua opacità */
+.mission-card {
+  position: relative;
+  padding: 15px;
+  background-color: var(--color-console-card);
+  border: 1px solid var(--color-console-neon-aqua);
+  border-radius: 5px;
+}
+
+.mission-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 20px var(--color-console-neon-cyan), inset 0 0 14px rgba(0, 188, 212, 0.6);
+  opacity: 0.5;
+  animation: pulseGlow 2.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes pulseGlow {
+  to {
+    opacity: 1;
+  }
+}
+
+.mission-title {
+  margin-bottom: 10px;
+  color: var(--color-console-neon-aqua);
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.mission-list li {
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px dotted rgba(77, 182, 172, 0.3);
+  color: var(--color-console-neon-data);
+}
+
+.mission-list strong {
+  color: var(--color-console-neon-green);
+}
+
+/* il bottone del curriculum */
+.command-button {
+  display: inline-block;
+  padding: 15px 30px;
+  background-color: var(--color-console-panel);
+  color: var(--color-console-neon-green);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-left: 5px solid var(--color-console-neon-cyan);
+  border-right: 5px solid var(--color-console-neon-aqua);
+  border-top: 2px solid var(--color-console-gray);
+  border-bottom: 2px solid var(--color-console-dark);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  transition:
+    background-color 200ms var(--ease-out),
+    color 200ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .command-button:hover {
+    background-color: var(--color-console-gray);
+    color: var(--color-console-neon-blue);
+    transform: translateY(2px);
+  }
+}
+
+.command-button:active {
+  transform: scale(0.97);
+}
+
+.command-button:focus-visible {
+  outline: 2px solid var(--color-console-neon-blue);
+  outline-offset: 4px;
+}
+
+.no-motion .console-screen::before,
+.no-motion .mission-card::after,
+.no-motion .console-cursor {
+  animation: none;
 }

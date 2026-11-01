@@ -14,6 +14,8 @@ import Twinkles from './Twinkles'
 import SpaceDust from './SpaceDust'
 import GreatComet from './GreatComet'
 import Rocket from './Rocket'
+import BinaryStars from './BinaryStars'
+import Eclipse from './Eclipse'
 import { CAMERA_Z, FOV, zAt } from './layout'
 
 export default function Universe({ reducedMotion }) {
@@ -49,6 +51,8 @@ export default function Universe({ reducedMotion }) {
         <Planets reduced={reducedMotion} />
         <BlackHole reduced={reducedMotion} />
         <Rocket reduced={reducedMotion} />
+        <BinaryStars reduced={reducedMotion} />
+        <Eclipse reduced={reducedMotion} />
         {/* la cosa più vicina alla camera dopo l'UFO: dà la profondità quando la camera si muove */}
         <SpaceDust reduced={reducedMotion} />
         {/* Suspense: useTexture sospende il render finché l'immagine non è caricata */}

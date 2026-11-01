@@ -1,6 +1,9 @@
 import { lazy, Suspense } from 'react'
 import ReducedMotionToggle from './components/ReducedMotionToggle'
 import PortholeOverlay from './components/PortholeOverlay'
+import Hero from './components/Hero'
+import JourneyIntro from './components/JourneyIntro'
+import About from './components/About'
 import { useReducedMotion } from './hooks/useReducedMotion'
 
 // la scena 3D (Three.js è quasi tutto il peso del sito) arriva in un file a parte: il titolo
@@ -16,11 +19,11 @@ function App() {
         <Universe reducedMotion={reducedMotion} />
       </Suspense>
       <ReducedMotionToggle reduced={reducedMotion} onToggle={toggleReducedMotion} />
-      {/* z-10 = sopra al canvas 3D. h1 è solo un placeholder, poi arriva l'hero vero */}
-      <main className="relative z-10 flex min-h-screen items-center justify-center">
-        <h1 className={`font-display hero-title${reducedMotion ? ' no-motion' : ''}`}>
-          Novenix
-        </h1>
+      {/* z-10 = sopra al canvas 3D, che resta fermo dietro mentre la pagina scorre */}
+      <main className="relative z-10">
+        <Hero reduced={reducedMotion} />
+        <JourneyIntro />
+        <About reduced={reducedMotion} />
       </main>
       <PortholeOverlay />
     </div>

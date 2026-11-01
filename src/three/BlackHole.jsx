@@ -8,8 +8,9 @@ import { isPortrait, placeAt, useAspect } from './layout'
 // pianeti (che occupano z -20/-52 in un raggio di ~40 unità dall'origine) e nuvole di nebulosa
 // (agli angoli estremi, z -90/-105)
 const ANCHOR = [0.32, 0.3]
-// sul telefono in verticale resta dentro lo schermo, un po' più piccolo
-const PORTRAIT_ANCHOR = [0.5, 0.3]
+// sul telefono in verticale resta dentro lo schermo, un po' più piccolo, in alto a sinistra:
+// al centro finiva dietro al titolo e alla riga con nome e ruolo dell'hero
+const PORTRAIT_ANCHOR = [-0.42, 0.86]
 const PORTRAIT_SCALE = 0.7
 const DISTANCE = 145
 const DISK_SCALE = 22
