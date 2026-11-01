@@ -1,5 +1,49 @@
 @import "tailwindcss";
 
+.cockpit-intro {
+  position: relative;
+}
+
+.cockpit-intro::after {
+  content: "";
+  display: block;
+  height: 120svh;
+}
+
+.cockpit-intro__viewport {
+  position: sticky;
+  top: 0;
+}
+
+.cockpit-intro__hero {
+  position: relative;
+  pointer-events: auto;
+}
+
+.cockpit-intro__hero .hero-enter {
+  animation: none;
+}
+
+.cockpit-intro__cabin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.cockpit-intro__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 43%;
+  transform-origin: 50% 43%;
+  user-select: none;
+}
+
 /* font Anta self-hosted invece che da Google Fonts CDN */
 @font-face {
   font-family: "Anta";

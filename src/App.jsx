@@ -1,9 +1,9 @@
 import { lazy, Suspense } from 'react'
 import ReducedMotionToggle from './components/ReducedMotionToggle'
 import PortholeOverlay from './components/PortholeOverlay'
-import Hero from './components/Hero'
 import JourneyIntro from './components/JourneyIntro'
 import About from './components/About'
+import CockpitIntro from './components/CockpitIntro'
 import { useReducedMotion } from './hooks/useReducedMotion'
 
 // la scena 3D (Three.js è quasi tutto il peso del sito) arriva in un file a parte: il titolo
@@ -20,8 +20,8 @@ function App() {
       </Suspense>
       <ReducedMotionToggle reduced={reducedMotion} onToggle={toggleReducedMotion} />
       {/* z-10 = sopra al canvas 3D, che resta fermo dietro mentre la pagina scorre */}
-      <main className="relative z-10">
-        <Hero reduced={reducedMotion} />
+      <main className="portfolio-content relative z-10">
+        <CockpitIntro reduced={reducedMotion} />
         <JourneyIntro />
         <About reduced={reducedMotion} />
       </main>
